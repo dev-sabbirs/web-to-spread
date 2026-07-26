@@ -133,14 +133,34 @@ function extractLinkedInAbout(): string {
 function extractLinkedInWebsite(): string {
   const websites: string[] = [];
 
-  // 1. Check open Contact Info modal links (e.g. .pv-contact-info__contact-type, .ci-websites, modal container)
+  // Parse LinkedIn safety redirect URLs (e.g. linkedin.com/safety/go/?url=https%3A%2F%2Fdevlopersabbir.github.io)
+  const parseRealUrl = (href: string): string => {
+    try {
+      if (href.includes('/safety/go/') && href.includes('url=')) {
+        const query = new URL(href).searchParams.get('url');
+        if (query) return decodeURIComponent(query);
+      }
+    } catch { /* ignore parse error */ }
+    return href;
+  };
+
+  // 1. Check all links inside contact modal (both legacy and new LazyColumn modal structure)
   const modalLinks = document.querySelectorAll<HTMLAnchorElement>(
-    '.pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, .ci-websites a[href], .artdeco-modal a[href*="http"]'
+    '[data-testid="lazy-column"] a[href], .pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, .ci-websites a[href], .artdeco-modal a[href*="http"]'
   );
+
   modalLinks.forEach((a) => {
-    const href = a.href || a.getAttribute('href') || '';
-    if (href && !href.includes('linkedin.com') && !href.startsWith('javascript:') && !websites.includes(href)) {
-      websites.push(href);
+    const rawHref = a.href || a.getAttribute('href') || '';
+    const cleanUrl = parseRealUrl(rawHref);
+
+    if (
+      cleanUrl &&
+      !cleanUrl.includes('linkedin.com/in/') &&
+      !cleanUrl.includes('mailto:') &&
+      !cleanUrl.startsWith('javascript:') &&
+      !websites.includes(cleanUrl)
+    ) {
+      websites.push(cleanUrl);
     }
   });
 
@@ -149,16 +169,21 @@ function extractLinkedInWebsite(): string {
     '.pv-top-card--experience-list a[href*="http"], a[id*="top-card-primary-button"], a[aria-label*="Website"], a.pv-top-card--website'
   );
   topCardSites.forEach((a) => {
-    const href = a.href || a.getAttribute('href') || '';
-    if (href && !href.includes('linkedin.com') && !href.startsWith('javascript:') && !websites.includes(href)) {
-      websites.push(href);
+    const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
+    if (
+      cleanUrl &&
+      !cleanUrl.includes('linkedin.com/in/') &&
+      !cleanUrl.startsWith('javascript:') &&
+      !websites.includes(cleanUrl)
+    ) {
+      websites.push(cleanUrl);
     }
   });
 
   // 3. Fallback: Any external link inside main profile container
   if (websites.length === 0) {
     const fallbackLink = document.querySelector<HTMLAnchorElement>('.scaffold-layout__main a[href*="http"]:not([href*="linkedin.com"])');
-    if (fallbackLink?.href) return fallbackLink.href;
+    if (fallbackLink?.href) return parseRealUrl(fallbackLink.href);
   }
 
   return websites.join(', ');
