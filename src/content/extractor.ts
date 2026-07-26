@@ -67,9 +67,12 @@ function first(...selectors: string[]): string {
 }
 
 function extractCompany(): string {
-  const el = document.querySelector<HTMLElement>('li[itemprop="worksFor"] span.p-org, li[itemprop="worksFor"]');
+  const el = document.querySelector<HTMLElement>('li[itemprop="worksFor"]');
   if (!el) return '';
-  return el.textContent?.replace(/^@/, '').trim() || '';
+  // Clean SVG icons or child node noise
+  const clone = el.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('svg').forEach((svg) => svg.remove());
+  return clone.textContent?.replace(/^[\s@]+/, '').trim() || '';
 }
 
 function extractBio(): string {
@@ -89,13 +92,15 @@ function extractWebsite(): string {
 function extractTwitter(): string {
   const el = document.querySelector<HTMLAnchorElement>('li[itemprop="social"] a[href*="twitter.com"], li[itemprop="social"] a[href*="x.com"]');
   if (el) return el.href;
-  const textEl = document.querySelector<HTMLElement>('li[itemprop="social"]');
-  return textEl?.textContent?.trim() || '';
+  return '';
 }
 
 function extractLinkedIn(): string {
+  const el = document.querySelector<HTMLAnchorElement>('li[itemprop="social"] a[href*="linkedin.com"]');
+  if (el) return el.href;
+
   let url = '';
-  document.querySelectorAll<HTMLAnchorElement>('a[href*="linkedin.com/in/"]')
+  document.querySelectorAll<HTMLAnchorElement>('a[href*="linkedin.com/in/"], a[href*="linkedin.com"]')
     .forEach((a) => { if (!url) url = a.href; });
   return url;
 }
