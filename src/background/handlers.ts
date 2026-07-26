@@ -104,9 +104,13 @@ async function postToScript(url: string, body: object): Promise<MessageResponse>
       };
     }
 
-    let json: { success?: boolean } = {};
+    let json: { success?: boolean; error?: string; data?: { headers: string[]; rows: string[][] } } = {};
     try { json = await res.json(); } catch { /* non-JSON body — treat HTTP 200 as success */ }
-    return { success: json.success ?? true };
+    return {
+      success: json.success ?? true,
+      error: json.error,
+      data: json.data,
+    };
   } catch (err) {
     return {
       success: false,
