@@ -36,10 +36,15 @@ async function handleClick(): Promise<void> {
   const emails = extractEmails();
   const profile = extractProfile();
 
+  const primaryEmail = emails[0] || '';
+  const secondaryEmails = emails.slice(1).join(', ');
+
   const payload: ExtractedData = {
     ...profile,
     url: window.location.href,
     timestamp: new Date().toISOString(),
+    primaryEmail,
+    secondaryEmails,
     emails,
   };
 

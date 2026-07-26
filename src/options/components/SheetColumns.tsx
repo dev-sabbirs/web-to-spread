@@ -2,14 +2,20 @@ import { InfoIcon } from '../icons';
 
 const COLUMNS = [
   { col: 'Timestamp', source: 'System clock', note: 'ISO 8601 — when button was clicked' },
-  { col: 'URL', source: 'Browser address bar', note: 'Full GitHub page URL' },
   { col: 'Username', source: 'URL path', note: 'e.g. github.com/torvalds → torvalds' },
   { col: 'Full Name', source: 'Profile DOM', note: 'Public display name' },
-  { col: 'Emails', source: 'mailto links + regex scan', note: 'Comma-separated; empty if private' },
-  { col: 'Bio', source: 'Profile bio section', note: 'Empty if not set publicly' },
-  { col: 'Location', source: 'Profile location field', note: 'Empty if not set publicly' },
-  { col: 'Website', source: 'Profile website link', note: 'Personal site or blog' },
-  { col: 'LinkedIn', source: 'Any linkedin.com/in/ link', note: 'Only if linked from profile' },
+  { col: 'Company', source: 'Profile DOM', note: 'Organization/Company name' },
+  { col: 'Primary Email', source: 'mailto link / regex scan', note: 'First & most relevant email' },
+  { col: 'Secondary Emails', source: 'mailto link / regex scan', note: 'Comma-separated additional emails' },
+  { col: 'Bio', source: 'Profile bio section', note: 'User bio statement' },
+  { col: 'Location', source: 'Profile location field', note: 'City / Country' },
+  { col: 'Website', source: 'Profile website link', note: 'Personal website or blog' },
+  { col: 'Twitter / X', source: 'Social links', note: 'Twitter / X handle URL' },
+  { col: 'LinkedIn', source: 'Social links', note: 'LinkedIn profile URL' },
+  { col: 'Repositories', source: 'Profile stats', note: 'Public repository count' },
+  { col: 'Followers', source: 'Profile stats', note: 'Number of followers' },
+  { col: 'Following', source: 'Profile stats', note: 'Number of accounts followed' },
+  { col: 'GitHub URL', source: 'Browser address bar', note: 'Direct link to profile' },
 ] as const;
 
 export function SheetColumns() {

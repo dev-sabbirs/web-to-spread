@@ -23,6 +23,88 @@ In your spreadsheet, click **Extensions → Apps Script**
 Delete any existing code and paste the following:
 
 ```javascript
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+
+    // Ping check (connection test from options page)
+    if (data.type === 'ping') {
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, message: 'Pong' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const sheetName = data.sheetName || 'Leads';
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(sheetName);
+
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+    }
+
+    // Define standard structured column headers
+    const headers = [
+      'Timestamp',
+      'Username',
+      'Full Name',
+      'Company',
+      'Primary Email',
+      'Secondary Emails',
+      'Bio',
+      'Location',
+      'Website',
+      'Twitter / X',
+      'LinkedIn',
+      'Repositories',
+      'Followers',
+      'Following',
+      'GitHub URL'
+    ];
+
+    // Create header row if sheet is empty
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(headers);
+      sheet.getRange(1, 1, 1, headers.length)
+        .setFontWeight('bold')
+        .setBackground('#1a73e8')
+        .setFontColor('#ffffff');
+      sheet.setFrozenRows(1);
+    }
+
+    const primaryEmail = data.primaryEmail || (data.emails && data.emails[0]) || '';
+    const secondaryEmails = data.secondaryEmails || (data.emails && data.emails.slice(1).join(', ')) || '';
+
+    // Append structured lead record
+    const row = [
+      data.timestamp || new Date().toISOString(),
+      data.username || '',
+      data.name || '',
+      data.company || '',
+      primaryEmail,
+      secondaryEmails,
+      data.bio || '',
+      data.location || '',
+      data.website || '',
+      data.twitter || '',
+      data.linkedin || '',
+      data.repositoriesCount || '',
+      data.followers || '',
+      data.following || '',
+      data.url || ''
+    ];
+
+    sheet.appendRow(row);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
 // Optional: Test function — run this manually in the editor to verify
 function testDoPost() {
   const mockEvent = {
@@ -32,11 +114,18 @@ function testDoPost() {
         url: "https://github.com/torvalds",
         username: "torvalds",
         name: "Linus Torvalds",
+        company: "Linux Foundation",
+        primaryEmail: "torvalds@linux-foundation.org",
+        secondaryEmails: "",
         emails: ["torvalds@linux-foundation.org"],
-        bio: "Creator of Linux kernel",
+        bio: "Creator of Linux kernel & Git",
         location: "Portland, OR",
         website: "https://kernel.org",
+        twitter: "",
         linkedin: "",
+        repositoriesCount: "12",
+        followers: "230000",
+        following: "0",
         sheetName: "Leads",
       }),
     },
@@ -97,17 +186,23 @@ function testDoPost() {
 
 ## Data Collected Per Row
 
-| Column    | Source                                  |
-| --------- | --------------------------------------- |
-| Timestamp | When the button was clicked             |
-| URL       | Current GitHub page URL                 |
-| Username  | From URL path (`github.com/<username>`) |
-| Full Name | From profile page DOM                   |
-| Emails    | Regex + mailto links scan               |
-| Bio       | Profile bio section                     |
-| Location  | Profile location field                  |
-| Website   | Profile website link                    |
-| LinkedIn  | Any `linkedin.com/in/` link on the page |
+| Column           | Source                                           |
+| ---------------- | ------------------------------------------------ |
+| Timestamp        | System clock (ISO 8601 when button clicked)      |
+| Username         | Profile URL (`github.com/<username>`)            |
+| Full Name        | Profile display name                             |
+| Company          | Work / Organization attribute                    |
+| Primary Email    | Main extracted email address                     |
+| Secondary Emails | Additional comma-separated emails found on page  |
+| Bio              | Profile biography statement                      |
+| Location         | Stated location/city                             |
+| Website          | Personal site/blog URL                           |
+| Twitter / X      | Twitter or X profile URL                         |
+| LinkedIn         | LinkedIn profile URL                             |
+| Repositories     | Public repository count                          |
+| Followers        | Follower count                                   |
+| Following        | Following count                                  |
+| GitHub URL       | Full GitHub profile page link                    |
 
 > **Note**: Only emails that are publicly visible on the GitHub page are collected.
 > GitHub users must have their email set to "public" in their settings for it to appear.
