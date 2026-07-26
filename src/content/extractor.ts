@@ -268,11 +268,16 @@ function isValidEmail(email: string): boolean {
   );
 }
 
-/** Return the trimmed textContent of the first matching selector, or ''. */
+/** Return the trimmed textContent of the first matching selector, or ''. Strips SVG icons/badges. */
 function first(...selectors: string[]): string {
   for (const sel of selectors) {
-    const text = document.querySelector<HTMLElement>(sel)?.textContent?.trim();
-    if (text) return text;
+    const el = document.querySelector<HTMLElement>(sel);
+    if (el) {
+      const clone = el.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('svg').forEach((s) => s.remove());
+      const text = clone.textContent?.trim();
+      if (text) return text;
+    }
   }
   return '';
 }
