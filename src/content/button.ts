@@ -16,14 +16,10 @@ export function injectButton(): void {
   btn.title = 'Extract lead & send to Google Sheet';
   btn.setAttribute('aria-label', 'Extract lead to Google Sheet');
 
-  let iconMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>`;
-  try {
-    const iconUrl = chrome.runtime.getURL('icon/128.png');
-    iconMarkup = `<img src="${iconUrl}" alt="WebToSpread Logo" onerror="this.outerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'currentColor\' width=\'22\' height=\'22\'><path d=\'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z\'/></svg>'" />`;
-  } catch { /* use SVG fallback */ }
+  const sparkIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2L14.5 8.5L21 11L14.5 13.5L12 20L9.5 13.5L3 11L9.5 8.5L12 2Z"/></svg>`;
 
   btn.innerHTML = `
-    <div class="w2s-icon-wrapper">${iconMarkup}</div>
+    <div class="w2s-icon-wrapper">${sparkIcon}</div>
     <span class="w2s-label">Save Lead</span>
   `;
 
@@ -37,8 +33,7 @@ async function handleClick(): Promise<void> {
   const btn = document.getElementById(ELEMENT_IDS.BUTTON);
   if (!btn || btn.classList.contains('ghe-loading')) return;
 
-  setLoading(btn, true);
-  showToast('🔍 Extracting…', 'info', 10_000);
+  setLoading(btn, true, 'Extracting…');
 
   const emails = extractEmails();
   const profile = await extractProfile();
@@ -62,24 +57,50 @@ async function handleClick(): Promise<void> {
     });
 
     if (response?.success) {
-      const emailLine = buildEmailLine(emails);
-      const platformLabel = profile.platform === 'linkedin' ? 'LinkedIn' : 'GitHub';
-      showToast(`✅ ${platformLabel} lead @${profile.username || profile.name || 'user'} saved\n${emailLine}`, 'success', 6_000);
+      setLoading(btn, false, 'Saved! ✓', 'success');
     } else {
-      const errMsg = response?.error ?? 'Failed — open extension Options to check your URL.';
-      showToast(`❌ ${errMsg}`, 'error', 7_000);
+      setLoading(btn, false, 'Failed ✕', 'error');
     }
   } catch {
-    showToast('❌ Background unreachable. Reload the page and try again.', 'error', 6_000);
+    setLoading(btn, false, 'Error ✕', 'error');
   }
-
-  setLoading(btn, false);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function setLoading(btn: HTMLElement, on: boolean): void {
-  btn.classList.toggle('ghe-loading', on);
+const SPARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2L14.5 8.5L21 11L14.5 13.5L12 20L9.5 13.5L3 11L9.5 8.5L12 2Z"/></svg>`;
+const CHECK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+const CROSS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+
+function setLoading(btn: HTMLElement, loading: boolean, labelText?: string, state?: 'success' | 'error'): void {
+  btn.classList.toggle('ghe-loading', loading);
+  btn.classList.toggle('w2s-success', state === 'success');
+  btn.classList.toggle('w2s-error', state === 'error');
+
+  const labelEl = btn.querySelector('.w2s-label');
+  const iconWrap = btn.querySelector('.w2s-icon-wrapper');
+
+  if (labelEl && labelText) {
+    labelEl.textContent = labelText;
+  }
+
+  if (iconWrap) {
+    if (state === 'success') {
+      iconWrap.innerHTML = CHECK_SVG;
+    } else if (state === 'error') {
+      iconWrap.innerHTML = CROSS_SVG;
+    } else {
+      iconWrap.innerHTML = SPARK_SVG;
+    }
+  }
+
+  if (state === 'success' || state === 'error') {
+    setTimeout(() => {
+      btn.classList.remove('w2s-success', 'w2s-error');
+      if (labelEl) labelEl.textContent = 'Save Lead';
+      if (iconWrap) iconWrap.innerHTML = SPARK_SVG;
+    }, 3500);
+  }
 }
 
 function buildEmailLine(emails: string[]): string {
