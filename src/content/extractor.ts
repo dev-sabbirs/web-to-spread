@@ -31,6 +31,7 @@ export function extractProfile(): ExtractedProfile {
   return {
     username: window.location.pathname.split('/').filter(Boolean)[0] ?? '',
     name: first('span[itemprop="name"]', 'h1.vcard-fullname', '.p-name'),
+    company: extractCompany(),
     bio: extractBio(),
     location: first(
       'li[itemprop="homeLocation"] span.p-label',
@@ -38,7 +39,11 @@ export function extractProfile(): ExtractedProfile {
       'span[itemprop="homeLocation"]',
     ),
     website: extractWebsite(),
+    twitter: extractTwitter(),
     linkedin: extractLinkedIn(),
+    followers: extractCount('a[href$="?tab=followers"] .Counter', 'a[href*="tab=followers"]'),
+    following: extractCount('a[href$="?tab=following"] .Counter', 'a[href*="tab=following"]'),
+    repositoriesCount: extractCount('a[href$="?tab=repositories"] .Counter', 'span[data-tab-item="repositories"] .Counter'),
   };
 }
 
@@ -61,6 +66,12 @@ function first(...selectors: string[]): string {
   return '';
 }
 
+function extractCompany(): string {
+  const el = document.querySelector<HTMLElement>('li[itemprop="worksFor"] span.p-org, li[itemprop="worksFor"]');
+  if (!el) return '';
+  return el.textContent?.replace(/^@/, '').trim() || '';
+}
+
 function extractBio(): string {
   // GitHub uses a data-attribute for the bio on newer profile pages
   const el = document.querySelector<HTMLElement>('[data-bio-text]');
@@ -75,9 +86,29 @@ function extractWebsite(): string {
   return el ? (el.href || el.textContent?.trim() || '') : '';
 }
 
+function extractTwitter(): string {
+  const el = document.querySelector<HTMLAnchorElement>('li[itemprop="social"] a[href*="twitter.com"], li[itemprop="social"] a[href*="x.com"]');
+  if (el) return el.href;
+  const textEl = document.querySelector<HTMLElement>('li[itemprop="social"]');
+  return textEl?.textContent?.trim() || '';
+}
+
 function extractLinkedIn(): string {
   let url = '';
   document.querySelectorAll<HTMLAnchorElement>('a[href*="linkedin.com/in/"]')
     .forEach((a) => { if (!url) url = a.href; });
   return url;
+}
+
+function extractCount(...selectors: string[]): string {
+  for (const sel of selectors) {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (el) {
+      const title = el.getAttribute('title');
+      if (title) return title.replace(/,/g, '').trim();
+      const text = el.textContent?.trim();
+      if (text) return text.replace(/,/g, '').trim();
+    }
+  }
+  return '';
 }

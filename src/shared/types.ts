@@ -3,15 +3,22 @@
 export interface ExtractedProfile {
   username: string;
   name: string;
+  company: string;
   bio: string;
   location: string;
   website: string;
+  twitter: string;
   linkedin: string;
+  followers: string;
+  following: string;
+  repositoriesCount: string;
 }
 
 export interface ExtractedData extends ExtractedProfile {
   url: string;
   timestamp: string;
+  primaryEmail: string;
+  secondaryEmails: string;
   emails: string[];
 }
 

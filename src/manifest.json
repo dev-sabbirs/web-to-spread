@@ -8,7 +8,15 @@
     "96": "icon/96.png",
     "128": "icon/128.png"
   },
-  "{{chrome}}.action": {},
+  "{{chrome}}.action": {
+    "default_icon": {
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png",
+      "96": "icon/96.png",
+      "128": "icon/128.png"
+    }
+  },
   "{{chrome}}.options_ui": {
     "page": "src/options.html",
     "open_in_tab": true

@@ -1,7 +1,8 @@
 {
-  "name": "extension",
-  "private": true,
+  "name": "web-to-spread",
   "version": "1.0.0",
+  "description": "Chrome extension to extract GitHub leads and data directly into Google Sheets via Google Apps Script.",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
