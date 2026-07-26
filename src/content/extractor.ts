@@ -133,13 +133,22 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
 }
 
 function extractLinkedInCompany(): string {
-  // 1. Check top card experience/company buttons featuring company logos or SVG icons (company-accent)
-  const companyItems = document.querySelectorAll('[role="button"], button, li');
-  for (const item of Array.from(companyItems)) {
-    if (item.querySelector('svg[id*="company-accent"], img[alt*="company"], img[src*="company-logo"]')) {
-      const pText = item.querySelector('p, span')?.textContent?.trim();
-      if (pText) return pText;
+  const companies: string[] = [];
+
+  // 1. Check experience/education buttons featuring company or school SVG accents/logos
+  const items = document.querySelectorAll<HTMLElement>('[role="button"], button, li, .pv-text-details__right-panel li');
+  items.forEach((item) => {
+    const hasCompanySvg = item.querySelector('svg[id*="company-accent"], svg[id*="school-accent"], img[alt*="company"], img[src*="company-logo"], img[src*="school"]');
+    if (hasCompanySvg) {
+      const name = item.querySelector('p, span')?.textContent?.trim();
+      if (name && !companies.includes(name)) {
+        companies.push(name);
+      }
     }
+  });
+
+  if (companies.length > 0) {
+    return companies.join(' · ');
   }
 
   // 2. Check traditional right-panel top card selectors

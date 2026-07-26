@@ -50,6 +50,10 @@ async function handleClick(): Promise<void> {
     emails,
   };
 
+  // Structured extraction console log for verification
+  console.log('--- Extracted Lead Structured JSON ---');
+  console.log(JSON.stringify(payload, null, 2));
+
   try {
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.SEND_TO_SHEET,

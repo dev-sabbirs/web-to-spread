@@ -121,7 +121,38 @@ function doPost(e) {
     const primaryEmail = data.primaryEmail || (data.emails && data.emails[0]) || '';
     const secondaryEmails = data.secondaryEmails || (data.emails && data.emails.slice(1).join(', ')) || '';
 
-    // Append structured lead record
+    // Deduplication / Upsert check: find existing row matching profile URL or username
+    const existingValues = sheet.getDataRange().getValues();
+    const existingHeaders = existingValues[0] || [];
+    
+    // Determine column index to match on (Profile URL or Username)
+    let matchColIdx = -1;
+    if (isLinkedIn) {
+      matchColIdx = existingHeaders.indexOf('LinkedIn Profile URL');
+      if (matchColIdx === -1) matchColIdx = existingHeaders.indexOf('URL');
+    } else {
+      matchColIdx = existingHeaders.indexOf('GitHub URL');
+      if (matchColIdx === -1) matchColIdx = existingHeaders.indexOf('Username');
+    }
+
+    const currentUrl = (data.url || data.linkedin || '').toLowerCase().trim();
+    const currentUsername = (data.username || '').toLowerCase().trim();
+
+    let existingRowIndex = -1;
+    if (matchColIdx !== -1 && existingValues.length > 1) {
+      for (let i = 1; i < existingValues.length; i++) {
+        const val = String(existingValues[i][matchColIdx] || '').toLowerCase().trim();
+        if (
+          (currentUrl && val === currentUrl) ||
+          (currentUsername && val === currentUsername)
+        ) {
+          existingRowIndex = i + 1; // 1-indexed row in Google Sheet
+          break;
+        }
+      }
+    }
+
+    // Append structured lead record or update existing row
     const row = isLinkedIn
       ? [
           data.timestamp || new Date().toISOString(),
@@ -157,7 +188,27 @@ function doPost(e) {
           '' // Empty Notes column for manual entry
         ];
 
-    sheet.appendRow(row);
+    if (existingRowIndex > 1) {
+      // Keep original timestamp if already present
+      if (existingValues[existingRowIndex - 1][0]) {
+        row[0] = existingValues[existingRowIndex - 1][0];
+      }
+      // Preserve existing manual Notes if user wrote any
+      const notesIdx = headers.indexOf('Notes');
+      if (notesIdx !== -1 && existingValues[existingRowIndex - 1][notesIdx]) {
+        row[notesIdx] = existingValues[existingRowIndex - 1][notesIdx];
+      }
+
+      sheet.getRange(existingRowIndex, 1, 1, row.length).setValues([row]);
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, message: 'Existing lead updated successfully.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } else {
+      sheet.appendRow(row);
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, message: 'New lead added successfully.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
     return ContentService
       .createTextOutput(JSON.stringify({ success: true }))
