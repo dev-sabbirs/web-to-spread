@@ -9,7 +9,7 @@ export const CONTENT_STYLES = `
   #${BUTTON} {
     position: fixed;
     bottom: 1.75rem;
-    right: 1.75rem;
+    left: 1.75rem;
     z-index: 2147483647;
     width: 3.25rem;
     height: 3.25rem;
@@ -25,6 +25,13 @@ export const CONTENT_STYLES = `
     color: #ffffff;
     padding: 0;
     outline: 2px solid transparent;
+    overflow: hidden;
+  }
+  #${BUTTON} img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    pointer-events: none;
   }
   #${BUTTON}:hover {
     transform: scale(1.1) translateY(-2px);
@@ -44,7 +51,7 @@ export const CONTENT_STYLES = `
   #${TOAST} {
     position: fixed;
     bottom: 5.75rem;
-    right: 1.75rem;
+    left: 1.75rem;
     z-index: 2147483647;
     background-color: #161b22;
     color: #f3f4f6;
@@ -62,7 +69,7 @@ export const CONTENT_STYLES = `
   #${TOAST}.ghe-success { border-left-color: #22c55e; }
   #${TOAST}.ghe-error   { border-left-color: #ef4444; }
   @keyframes ghe-slide {
-    from { transform: translateX(1rem); opacity: 0; }
+    from { transform: translateX(-1rem); opacity: 0; }
     to   { transform: translateX(0); opacity: 1; }
   }
 `;

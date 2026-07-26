@@ -41,5 +41,11 @@
       "js": ["src/content.ts"],
       "run_at": "document_idle"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icon/128.png", "icon/*.png"],
+      "matches": ["https://github.com/*", "https://*.linkedin.com/*"]
+    }
   ]
 }

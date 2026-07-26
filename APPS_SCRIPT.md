@@ -51,15 +51,17 @@ function doPost(e) {
       ? [
           'Timestamp',
           'Name',
-          'Headline / Bio',
+          'Headline',
+          'About / Summary',
           'Company',
           'Location',
           'Primary Email',
           'Secondary Emails',
           'LinkedIn Profile URL',
-          'Website',
+          'Website / Contact Link',
           'Connection Degree',
-          'Source Platform'
+          'Source Platform',
+          'Notes'
         ]
       : [
           'Timestamp',
@@ -76,7 +78,8 @@ function doPost(e) {
           'Repositories',
           'Followers',
           'Following',
-          'GitHub URL'
+          'GitHub URL',
+          'Notes'
         ];
 
     // Create header row if sheet is empty
@@ -97,7 +100,8 @@ function doPost(e) {
       ? [
           data.timestamp || new Date().toISOString(),
           data.name || '',
-          data.headline || data.bio || '',
+          data.headline || '',
+          data.about || data.bio || '',
           data.company || '',
           data.location || '',
           primaryEmail,
@@ -105,7 +109,8 @@ function doPost(e) {
           data.url || data.linkedin || '',
           data.website || '',
           data.connectionDegree || '',
-          'LinkedIn'
+          'LinkedIn',
+          '' // Empty Notes column for manual entry
         ]
       : [
           data.timestamp || new Date().toISOString(),
@@ -122,7 +127,8 @@ function doPost(e) {
           data.repositoriesCount || '',
           data.followers || '',
           data.following || '',
-          data.url || ''
+          data.url || '',
+          '' // Empty Notes column for manual entry
         ];
 
     sheet.appendRow(row);

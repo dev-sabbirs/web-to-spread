@@ -2,31 +2,46 @@
 
 export type Platform = 'github' | 'linkedin';
 
-export interface ExtractedProfile {
+export interface BaseExtractedProfile {
   platform: Platform;
-  username: string;
   name: string;
-  headline?: string;
   company: string;
-  bio: string;
   location: string;
   website: string;
+  notes?: string;
+}
+
+export interface GitHubProfile extends BaseExtractedProfile {
+  platform: 'github';
+  username: string;
+  bio: string;
   twitter: string;
   linkedin: string;
   followers: string;
   following: string;
   repositoriesCount: string;
-  connectionDegree?: string;
 }
 
-export interface ExtractedData extends ExtractedProfile {
+export interface LinkedInProfile extends BaseExtractedProfile {
+  platform: 'linkedin';
+  username: string;
+  headline: string;
+  about: string;
+  linkedin: string;
+  connectionDegree: string;
+  followers: string;
+}
+
+export type ExtractedProfile = GitHubProfile | LinkedInProfile;
+
+export type ExtractedData = ExtractedProfile & {
   url: string;
   timestamp: string;
   primaryEmail: string;
   secondaryEmails: string;
   emails: string[];
   targetSheetName?: string;
-}
+};
 
 // ─── Chrome Extension Messages ────────────────────────────────────────────────
 

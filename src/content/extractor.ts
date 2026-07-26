@@ -57,11 +57,30 @@ function extractGitHubProfile(): ExtractedProfile {
 }
 
 function extractLinkedInProfile(): ExtractedProfile {
-  const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li');
-  const headline = first('.text-body-medium[data-generated-suggestion-target]', '.pv-top-card--list-bullet .text-body-medium');
-  const location = first('.pb5 .text-body-small.inline', '.pv-top-card--list-bullet + div .text-body-small');
-  const company = first('.pv-text-details__right-panel span', 'button[aria-label*="Current company"] span');
+  const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li', '.pv-text-details__left-panel h1');
+  const headline = first(
+    '.text-body-medium[data-generated-suggestion-target]',
+    '.pv-top-card--list-bullet .text-body-medium',
+    '.pv-text-details__left-panel .text-body-medium',
+    'div[data-test-id="headline"]'
+  );
+  const location = first(
+    '.pb5 .text-body-small.inline',
+    '.pv-top-card--list-bullet + div .text-body-small',
+    '.pv-text-details__left-panel .text-body-small'
+  );
+  const company = first(
+    '.pv-text-details__right-panel span',
+    'button[aria-label*="Current company"] span',
+    'ul.pv-text-details__right-panel li span'
+  );
   const connectionDegree = first('.dist-value', 'span.distance-badge');
+
+  // Extract full "About" section text
+  const about = extractLinkedInAbout();
+
+  // Extract website & contact links
+  const website = extractLinkedInWebsite();
 
   // Extract handle/username from LinkedIn URL (e.g. linkedin.com/in/john-doe)
   const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -73,16 +92,42 @@ function extractLinkedInProfile(): ExtractedProfile {
     name,
     headline,
     company,
-    bio: headline, // headline serves as bio for LinkedIn leads
+    about,
     location,
-    website: extractWebsite(),
-    twitter: '',
+    website,
     linkedin: window.location.href,
-    followers: '',
-    following: '',
-    repositoriesCount: '',
+    followers: first('span.pvs-header__optional-link span', '.pv-recent-activity-section__follower-count'),
     connectionDegree,
+    notes: '',
   };
+}
+
+function extractLinkedInAbout(): string {
+  // Try finding the About section container
+  const aboutSection = document.querySelector('#about')?.closest('section');
+  if (aboutSection) {
+    const textEl = aboutSection.querySelector('.display-flex .inline-show-more-text, .pv-about__summary-text, span[aria-hidden="true"]');
+    if (textEl) return textEl.textContent?.trim() || '';
+  }
+  return first('.pv-about-section', '#about + div span');
+}
+
+function extractLinkedInWebsite(): string {
+  // Check main website links on profile
+  const mainSite = document.querySelector<HTMLAnchorElement>('.pv-top-card--experience-list a[href*="http"], a[id*="top-card-primary-button"]');
+  if (mainSite?.href) return mainSite.href;
+
+  // Contact info popup / section links
+  const contactLinks = document.querySelectorAll<HTMLAnchorElement>('.pv-contact-info__contact-type.ci-websites a, a[href*="http"]:not([href*="linkedin.com"])');
+  for (const a of contactLinks) {
+    if (a.href && !a.href.includes('linkedin.com')) return a.href;
+  }
+  return first('li[itemprop="url"] a');
+}
+
+function extractLinkedInTwitter(): string {
+  const el = document.querySelector<HTMLAnchorElement>('a[href*="twitter.com"], a[href*="x.com"]');
+  return el ? el.href : '';
 }
 
 // ─── Internal Helpers ─────────────────────────────────────────────────────────
