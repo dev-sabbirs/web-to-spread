@@ -102,7 +102,13 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
 
   // Extract handle/username from LinkedIn URL (e.g. linkedin.com/in/john-doe)
   const pathParts = window.location.pathname.split('/').filter(Boolean);
-  const username = pathParts[pathParts.indexOf('in') + 1] || pathParts[0] || '';
+  const inIndex = pathParts.indexOf('in');
+  const username = inIndex !== -1 && pathParts[inIndex + 1] ? pathParts[inIndex + 1] : pathParts[0] || '';
+
+  // Clean canonical profile URL (e.g. https://www.linkedin.com/in/username)
+  const cleanLinkedinUrl = username
+    ? `https://www.linkedin.com/in/${username}`
+    : window.location.origin + window.location.pathname.replace(/\/overlay\/.*$/, '');
 
   return {
     platform: 'linkedin',
@@ -113,7 +119,7 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
     about,
     location,
     website,
-    linkedin: window.location.href,
+    linkedin: cleanLinkedinUrl,
     followers: first('span.pvs-header__optional-link span', '.pv-recent-activity-section__follower-count'),
     connectionDegree,
     notes: '',

@@ -10,16 +10,61 @@ import './styles/tailwind.css';
 
 type TabId = 'dashboard' | 'leads' | 'settings' | 'guide';
 
+function getInitialTabState(): { tab: TabId; platform: 'github' | 'linkedin' } {
+  const hash = window.location.hash.replace(/^#/, '');
+  const [tabPart, queryPart] = hash.split('?');
+  const validTabs: TabId[] = ['dashboard', 'leads', 'settings', 'guide'];
+
+  const tab = validTabs.includes(tabPart as TabId) ? (tabPart as TabId) : 'dashboard';
+
+  let platform: 'github' | 'linkedin' = 'github';
+  if (queryPart) {
+    const params = new URLSearchParams(queryPart);
+    const p = params.get('platform');
+    if (p === 'linkedin' || p === 'github') platform = p;
+  }
+
+  return { tab, platform };
+}
+
 export default function Options() {
   const hook = useSettings();
-  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const initial = getInitialTabState();
+  const [activeTab, setActiveTab] = useState<TabId>(initial.tab);
+  const [leadsPlatform, setLeadsPlatform] = useState<'github' | 'linkedin'>(initial.platform);
+
+  // Synchronize state with URL hash changes (back/forward navigation, manual hash edits, page reloads)
+  React.useEffect(() => {
+    const handleHashChange = () => {
+      const state = getInitialTabState();
+      setActiveTab(state.tab);
+      setLeadsPlatform(state.platform);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
+
+  const handleSelectTab = (tab: TabId, platform?: 'github' | 'linkedin') => {
+    setActiveTab(tab);
+    if (platform) {
+      setLeadsPlatform(platform);
+    }
+    const targetPlatform = platform || (tab === 'leads' ? leadsPlatform : undefined);
+    const newHash = targetPlatform ? `#${tab}?platform=${targetPlatform}` : `#${tab}`;
+    window.location.hash = newHash;
+  };
 
   return (
     <div className="flex min-h-screen bg-[#0d1117] text-[#e6edf3] font-sans antialiased">
       <Sidebar
         isConfigured={hook.isConfigured}
         activeTab={activeTab}
-        onSelectTab={(tab) => setActiveTab(tab as TabId)}
+        onSelectTab={(tab) => handleSelectTab(tab as TabId)}
       />
 
       <main className="flex-1 min-w-0 p-6 md:p-10 w-full">
@@ -34,7 +79,7 @@ export default function Options() {
               </div>
             </div>
             <button
-              onClick={() => setActiveTab('settings')}
+              onClick={() => handleSelectTab('settings')}
               className="px-3 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold rounded-lg shrink-0 transition-colors"
             >
               Configure Settings →
@@ -54,7 +99,7 @@ export default function Options() {
               linkedinSheetName={hook.settings.linkedinSheetName}
               isConfigured={hook.isConfigured}
               appsScriptUrl={hook.settings.appsScriptUrl}
-              onNavigate={(tab) => setActiveTab(tab)}
+              onNavigate={(tab, platform) => handleSelectTab(tab, platform)}
             />
           </section>
         )}
@@ -67,9 +112,11 @@ export default function Options() {
               <p className="text-xs text-[#8b949e] mt-1">Preview live extracted leads from your Google Sheet or flush existing records.</p>
             </div>
             <LeadDashboard
+              key={leadsPlatform}
               githubSheetName={hook.settings.githubSheetName}
               linkedinSheetName={hook.settings.linkedinSheetName}
               isConfigured={hook.isConfigured}
+              initialPlatform={leadsPlatform}
             />
           </section>
         )}

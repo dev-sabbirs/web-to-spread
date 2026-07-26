@@ -7,14 +7,16 @@ interface LeadDashboardProps {
   githubSheetName: string;
   linkedinSheetName: string;
   isConfigured: boolean;
+  initialPlatform?: 'github' | 'linkedin';
 }
 
 export function LeadDashboard({
   githubSheetName,
   linkedinSheetName,
   isConfigured,
+  initialPlatform = 'github',
 }: LeadDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'github' | 'linkedin'>('github');
+  const [activeTab, setActiveTab] = useState<'github' | 'linkedin'>(initialPlatform);
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<string[][]>([]);
   const [loading, setLoading] = useState(false);
@@ -94,14 +96,19 @@ export function LeadDashboard({
       );
     }
 
-    // 2. Format Website / Contact Link cell with 1+, 2+ count badges if multiple links exist
-    if (lowerHeader.includes('website') || cellValue.includes('http')) {
+    // 2. Format Website / Contact Link cell (supports both http://... and plain domains like example.com)
+    if (
+      lowerHeader.includes('website') ||
+      lowerHeader.includes('url') ||
+      cellValue.includes('http') ||
+      /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(cellValue.trim())
+    ) {
       const parts = cellValue.split(',').map((p) => p.trim()).filter(Boolean);
-      const httpLinks = parts.filter((p) => p.startsWith('http'));
+      const links = parts.map((p) => (p.startsWith('http://') || p.startsWith('https://') ? p : `https://${p}`));
 
-      if (httpLinks.length > 0) {
-        const firstLink = httpLinks[0];
-        const extraCount = httpLinks.length - 1;
+      if (links.length > 0) {
+        const firstLink = links[0];
+        const extraCount = links.length - 1;
 
         return (
           <div className="flex items-center gap-1.5">

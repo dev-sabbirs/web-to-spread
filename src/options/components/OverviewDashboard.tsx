@@ -8,7 +8,7 @@ interface OverviewDashboardProps {
   linkedinSheetName: string;
   isConfigured: boolean;
   appsScriptUrl: string;
-  onNavigate: (tab: 'dashboard' | 'leads' | 'settings' | 'guide') => void;
+  onNavigate: (tab: 'dashboard' | 'leads' | 'settings' | 'guide', platform?: 'github' | 'linkedin') => void;
 }
 
 export function OverviewDashboard({
@@ -84,7 +84,7 @@ export function OverviewDashboard({
             </p>
           </div>
           <button
-            onClick={() => onNavigate('leads')}
+            onClick={() => onNavigate('leads', 'github')}
             className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 text-left transition-colors pt-2 border-t border-[#21262d]"
           >
             Manage GitHub Table →
@@ -108,7 +108,7 @@ export function OverviewDashboard({
             </p>
           </div>
           <button
-            onClick={() => onNavigate('leads')}
+            onClick={() => onNavigate('leads', 'linkedin')}
             className="text-xs font-semibold text-blue-400 hover:text-blue-300 text-left transition-colors pt-2 border-t border-[#21262d]"
           >
             Manage LinkedIn Table →
