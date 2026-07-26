@@ -1,18 +1,19 @@
-import { PhoneIcon, SettingsIcon, BookIcon, TableIcon } from '../icons';
+import { PhoneIcon, SettingsIcon, BookIcon, DashboardIcon, UsersIcon } from '../icons';
 
 interface SidebarProps {
   isConfigured: boolean;
-  activeSection: string;
+  activeTab: string;
+  onSelectTab: (tab: string) => void;
 }
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Leads Dashboard', Icon: TableIcon },
+  { id: 'dashboard', label: 'Dashboard', Icon: DashboardIcon },
+  { id: 'leads', label: 'Leads', Icon: UsersIcon },
   { id: 'settings', label: 'Settings', Icon: SettingsIcon },
   { id: 'guide', label: 'Setup Guide', Icon: BookIcon },
-  { id: 'columns', label: 'Data Reference', Icon: TableIcon },
 ] as const;
 
-export function Sidebar({ isConfigured, activeSection }: SidebarProps) {
+export function Sidebar({ isConfigured, activeTab, onSelectTab }: SidebarProps) {
   return (
     <aside className="hidden md:flex w-60 shrink-0 bg-[#161b22] border-r border-[#21262d] flex-col p-6 sticky top-0 h-screen overflow-y-auto gap-6">
       {/* Brand */}
@@ -22,7 +23,7 @@ export function Sidebar({ isConfigured, activeSection }: SidebarProps) {
         </div>
         <div>
           <h1 className="text-xs font-bold text-[#e6edf3] leading-tight">
-            GitHub Lead<br />Extractor
+            WebToSpread<br />Lead Extractor
           </h1>
         </div>
       </div>
@@ -46,20 +47,20 @@ export function Sidebar({ isConfigured, activeSection }: SidebarProps) {
       {/* Navigation */}
       <nav className="flex flex-col gap-1 flex-1" aria-label="Settings navigation">
         {NAV_ITEMS.map(({ id, label, Icon }) => {
-          const isActive = activeSection === id;
+          const isActive = activeTab === id;
           return (
-            <a
+            <button
               key={id}
-              href={`#${id}`}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+              onClick={() => onSelectTab(id)}
+              className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-full text-left ${
                 isActive
-                  ? 'bg-indigo-500/15 text-indigo-300'
+                  ? 'bg-indigo-500/15 text-indigo-300 font-semibold'
                   : 'text-[#8b949e] hover:bg-[#21262d] hover:text-[#e6edf3]'
               }`}
             >
               <Icon size={16} />
               <span>{label}</span>
-            </a>
+            </button>
           );
         })}
       </nav>
