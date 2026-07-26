@@ -147,23 +147,26 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
 function extractLinkedInCompany(): string {
   const companies: string[] = [];
 
-  // 1. Check experience/education buttons featuring company or school SVG accents/logos
-  const items = document.querySelectorAll<HTMLElement>('[role="button"], button, li, .pv-text-details__right-panel li');
-  items.forEach((item) => {
-    const hasCompanySvg = item.querySelector('svg[id*="company-accent"], svg[id*="school-accent"], img[alt*="company"], img[src*="company-logo"], img[src*="school"]');
-    if (hasCompanySvg) {
-      const name = item.querySelector('p, span')?.textContent?.trim();
-      if (name && !companies.includes(name)) {
-        companies.push(name);
+  // Scope specifically to the top profile card header section
+  const topCardHeader = document.querySelector('._096f0583, .pv-top-card, .scaffold-layout__main');
+  if (topCardHeader) {
+    const items = topCardHeader.querySelectorAll<HTMLElement>('[role="button"], button, li, .pv-text-details__right-panel li');
+    items.forEach((item) => {
+      const hasCompanySvg = item.querySelector('svg[id*="company-accent"], svg[id*="school-accent"], img[alt*="company"], img[src*="company-logo"], img[src*="school"]');
+      if (hasCompanySvg) {
+        const name = item.querySelector('p, span')?.textContent?.trim();
+        if (name && !companies.includes(name)) {
+          companies.push(name);
+        }
       }
-    }
-  });
+    });
+  }
 
   if (companies.length > 0) {
     return companies.join(' · ');
   }
 
-  // 2. Check traditional right-panel top card selectors
+  // Fallback to traditional right panel
   return first(
     '.pv-text-details__right-panel span',
     'button[aria-label*="Current company"] span',
@@ -218,7 +221,7 @@ function extractLinkedInWebsite(): string {
     if (!url || url.startsWith('javascript:')) return true;
     const lower = url.toLowerCase();
 
-    // Skip all internal LinkedIn application links
+    // Skip all internal LinkedIn links & jobs
     if (lower.includes('linkedin.com/')) {
       if (
         lower.includes('linkedin.com/feed') ||
@@ -227,6 +230,8 @@ function extractLinkedInWebsite(): string {
         lower.includes('linkedin.com/search') ||
         lower.includes('linkedin.com/messaging') ||
         lower.includes('linkedin.com/newsletters') ||
+        lower.includes('linkedin.com/jobs/') ||
+        lower.includes('linkedin.com/services/') ||
         lower.includes('linkedin.com/in/') ||
         lower.includes('linkedin.com/company/')
       ) {
@@ -237,39 +242,30 @@ function extractLinkedInWebsite(): string {
     return false;
   };
 
-  // 1. Prioritize explicit Website container inside contact info modal (ci-websites / Website header)
+  // Strictly target explicit Website container inside contact info modal (ci-websites / Website header / safety redirect)
   const contactModal = document.querySelector('[data-testid="lazy-column"], .pv-contact-info__contact-type, .artdeco-modal');
   if (contactModal) {
-    // Look specifically for website section links
-    const websiteItems = contactModal.querySelectorAll<HTMLAnchorElement>('.ci-websites a[href], [componentkey*="link"] a[href], a[href*="safety/go/"]');
+    const websiteItems = contactModal.querySelectorAll<HTMLAnchorElement>(
+      '.ci-websites a[href], a[href*="safety/go/"], [componentkey*="website"] a[href], .pv-contact-info__contact-type--website a[href]'
+    );
     websiteItems.forEach((a) => {
       const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
       if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
         websites.push(cleanUrl);
       }
     });
-
-    // If still no website found from explicit selectors, check modal links
-    if (websites.length === 0) {
-      contactModal.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
-        const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
-        if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
-          websites.push(cleanUrl);
-        }
-      });
-    }
   }
 
-  // 2. Check main top-card website buttons/links (e.g. "Visit my website", custom link button)
-  const topCardSites = document.querySelectorAll<HTMLAnchorElement>(
-    '.pv-top-card--experience-list a[href*="http"], a[id*="top-card-primary-button"], a[aria-label*="Website"], a.pv-top-card--website'
+  // Check main top-card website button
+  const topCardSite = document.querySelector<HTMLAnchorElement>(
+    'a[aria-label*="Website"], a.pv-top-card--website'
   );
-  topCardSites.forEach((a) => {
-    const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
+  if (topCardSite) {
+    const cleanUrl = parseRealUrl(topCardSite.href || topCardSite.getAttribute('href') || '');
     if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
       websites.push(cleanUrl);
     }
-  });
+  }
 
   return websites.join(', ');
 }
