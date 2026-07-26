@@ -34,12 +34,38 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
     const platform = data.platform || 'github';
     const defaultTabName = platform === 'linkedin' ? 'LinkedIn Leads' : 'GitHub Leads';
     const sheetName = data.sheetName || defaultTabName;
-
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName(sheetName);
+
+    // Action: Read table data for dashboard preview
+    if (data.action === 'getLeads') {
+      if (!sheet || sheet.getLastRow() === 0) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ success: true, data: { headers: [], rows: [] } }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+
+      const values = sheet.getDataRange().getValues();
+      const headers = values[0] || [];
+      const rows = values.slice(1) || [];
+
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, data: { headers, rows } }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Action: Flush / clear all rows (keeping header row intact)
+    if (data.action === 'flushSheet') {
+      if (sheet && sheet.getLastRow() > 1) {
+        sheet.deleteRows(2, sheet.getLastRow() - 1);
+      }
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true, message: 'Sheet flushed successfully.' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
     if (!sheet) {
       sheet = ss.insertSheet(sheetName);

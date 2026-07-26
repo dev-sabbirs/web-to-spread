@@ -1,5 +1,6 @@
 import { AlertIcon } from './icons';
 import { Sidebar } from './components/Sidebar';
+import { LeadDashboard } from './components/LeadDashboard';
 import { ConfigCard } from './components/ConfigCard';
 import { HowItWorks } from './components/HowItWorks';
 import { SheetColumns } from './components/SheetColumns';
@@ -11,19 +12,28 @@ export default function Options() {
 
   return (
     <div className="flex min-h-screen bg-[#0d1117] text-[#e6edf3] font-sans antialiased">
-      <Sidebar isConfigured={hook.isConfigured} activeSection="settings" />
+      <Sidebar isConfigured={hook.isConfigured} activeSection="dashboard" />
 
-      <main className="flex-1 min-w-0 p-6 md:p-12 max-w-4xl">
+      <main className="flex-1 min-w-0 p-6 md:p-12 max-w-5xl">
         {/* Not-configured banner */}
         {!hook.isConfigured && (
           <div className="flex items-start gap-3 p-4 mb-8 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs leading-relaxed" role="alert">
             <AlertIcon size={18} className="shrink-0 mt-0.5" />
             <div>
               <strong className="text-[#e6edf3] font-semibold">Extension not configured.</strong>{' '}
-              Paste your Apps Script URL below and click Save to start extracting GitHub leads.
+              Paste your Apps Script URL below and click Save to start extracting GitHub & LinkedIn leads.
             </div>
           </div>
         )}
+
+        {/* ── Dashboard ── */}
+        <section id="dashboard" className="mb-14">
+          <LeadDashboard
+            githubSheetName={hook.settings.githubSheetName}
+            linkedinSheetName={hook.settings.linkedinSheetName}
+            isConfigured={hook.isConfigured}
+          />
+        </section>
 
         {/* ── Settings ── */}
         <section id="settings" className="mb-14">

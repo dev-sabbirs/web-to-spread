@@ -1,7 +1,12 @@
 // Background service worker entry point — registers message listeners only.
 
 import browser from 'webextension-polyfill';
-import { handleSendToSheet, handleTestConnection } from './background/handlers';
+import {
+  handleSendToSheet,
+  handleTestConnection,
+  handleFetchLeads,
+  handleFlushSheet,
+} from './background/handlers';
 import type { ExtensionMessage, MessageResponse } from './shared/types';
 import { MESSAGE_TYPES } from './shared/constants';
 
@@ -18,6 +23,16 @@ chrome.runtime.onMessage.addListener(
 
     if (message.type === MESSAGE_TYPES.TEST_CONNECTION) {
       handleTestConnection(message.scriptUrl).then(sendResponse);
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.FETCH_LEADS) {
+      handleFetchLeads(message.sheetName).then(sendResponse);
+      return true;
+    }
+
+    if (message.type === MESSAGE_TYPES.FLUSH_SHEET) {
+      handleFlushSheet(message.sheetName).then(sendResponse);
       return true;
     }
   },

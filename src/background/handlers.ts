@@ -52,6 +52,40 @@ export async function handleTestConnection(scriptUrl: string): Promise<MessageRe
   });
 }
 
+/**
+ * Fetch rows from Google Sheet for the requested sheet tab name.
+ */
+export async function handleFetchLeads(sheetName: string): Promise<MessageResponse> {
+  const stored = await chrome.storage.sync.get([STORAGE_KEYS.APPS_SCRIPT_URL]);
+  const scriptUrl = stored[STORAGE_KEYS.APPS_SCRIPT_URL] as string | undefined;
+
+  if (!scriptUrl) {
+    return { success: false, error: 'No Apps Script URL set.' };
+  }
+
+  return postToScript(scriptUrl, {
+    action: 'getLeads',
+    sheetName,
+  });
+}
+
+/**
+ * Flush all data rows in the target sheet tab (retaining header row).
+ */
+export async function handleFlushSheet(sheetName: string): Promise<MessageResponse> {
+  const stored = await chrome.storage.sync.get([STORAGE_KEYS.APPS_SCRIPT_URL]);
+  const scriptUrl = stored[STORAGE_KEYS.APPS_SCRIPT_URL] as string | undefined;
+
+  if (!scriptUrl) {
+    return { success: false, error: 'No Apps Script URL set.' };
+  }
+
+  return postToScript(scriptUrl, {
+    action: 'flushSheet',
+    sheetName,
+  });
+}
+
 // ─── Internal ─────────────────────────────────────────────────────────────────
 
 async function postToScript(url: string, body: object): Promise<MessageResponse> {

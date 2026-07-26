@@ -55,11 +55,29 @@ export interface TestConnectionMessage {
   scriptUrl: string;
 }
 
-export type ExtensionMessage = SendToSheetMessage | TestConnectionMessage;
+export interface FetchLeadsMessage {
+  type: 'FETCH_LEADS';
+  sheetName: string;
+}
+
+export interface FlushSheetMessage {
+  type: 'FLUSH_SHEET';
+  sheetName: string;
+}
+
+export type ExtensionMessage =
+  | SendToSheetMessage
+  | TestConnectionMessage
+  | FetchLeadsMessage
+  | FlushSheetMessage;
 
 export interface MessageResponse {
   success: boolean;
   error?: string;
+  data?: {
+    headers: string[];
+    rows: string[][];
+  };
 }
 
 // ─── UI State Types ───────────────────────────────────────────────────────────

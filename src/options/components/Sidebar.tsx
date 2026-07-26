@@ -6,6 +6,7 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
+  { id: 'dashboard', label: 'Leads Dashboard', Icon: TableIcon },
   { id: 'settings', label: 'Settings', Icon: SettingsIcon },
   { id: 'guide', label: 'Setup Guide', Icon: BookIcon },
   { id: 'columns', label: 'Data Reference', Icon: TableIcon },
