@@ -81,11 +81,7 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
     '.pv-top-card--list-bullet + div .text-body-small',
     '.pv-text-details__left-panel .text-body-small'
   );
-  const company = first(
-    '.pv-text-details__right-panel span',
-    'button[aria-label*="Current company"] span',
-    'ul.pv-text-details__right-panel li span'
-  );
+  const company = extractLinkedInCompany();
   const connectionDegree = first('.dist-value', 'span.distance-badge');
 
   // Extract full "About" section text
@@ -126,13 +122,50 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
   };
 }
 
-function extractLinkedInAbout(): string {
-  // Try finding the About section container
-  const aboutSection = document.querySelector('#about')?.closest('section');
-  if (aboutSection) {
-    const textEl = aboutSection.querySelector('.display-flex .inline-show-more-text, .pv-about__summary-text, span[aria-hidden="true"]');
-    if (textEl) return textEl.textContent?.trim() || '';
+function extractLinkedInCompany(): string {
+  // 1. Check top card experience/company buttons featuring company logos or SVG icons (company-accent)
+  const companyItems = document.querySelectorAll('[role="button"], button, li');
+  for (const item of Array.from(companyItems)) {
+    if (item.querySelector('svg[id*="company-accent"], img[alt*="company"], img[src*="company-logo"]')) {
+      const pText = item.querySelector('p, span')?.textContent?.trim();
+      if (pText) return pText;
+    }
   }
+
+  // 2. Check traditional right-panel top card selectors
+  return first(
+    '.pv-text-details__right-panel span',
+    'button[aria-label*="Current company"] span',
+    'ul.pv-text-details__right-panel li span'
+  );
+}
+
+function extractLinkedInAbout(): string {
+  // 1. Try modern LinkedIn expandable text box (e.g. data-testid="expandable-text-box")
+  const expandableBox = document.querySelector('[data-testid="expandable-text-box"]');
+  if (expandableBox) {
+    const clone = expandableBox.cloneNode(true) as HTMLElement;
+    // Remove "… more" button before extracting text content
+    clone.querySelectorAll('button, [data-testid="expandable-text-button"]').forEach((btn) => btn.remove());
+    const text = clone.textContent?.trim();
+    if (text) return text;
+  }
+
+  // 2. Try finding section via #about header
+  const aboutSection = document.querySelector('#about')?.closest('section, div');
+  if (aboutSection) {
+    const textEl = aboutSection.querySelector(
+      '[data-testid="expandable-text-box"], .inline-show-more-text, .pv-about__summary-text, span[aria-hidden="true"]'
+    );
+    if (textEl) {
+      const clone = textEl.cloneNode(true) as HTMLElement;
+      clone.querySelectorAll('button').forEach((b) => b.remove());
+      const text = clone.textContent?.trim();
+      if (text) return text;
+    }
+  }
+
+  // 3. Fallbacks for legacy/mobile structures
   return first('.pv-about-section', '#about + div span');
 }
 

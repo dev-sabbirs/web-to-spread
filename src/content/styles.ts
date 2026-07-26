@@ -8,56 +8,104 @@ const { BUTTON, TOAST } = ELEMENT_IDS;
 export const CONTENT_STYLES = `
   #${BUTTON} {
     position: fixed;
-    bottom: 1.75rem;
-    left: 1.75rem;
+    bottom: 2.25rem;
+    left: 2.25rem;
     z-index: 2147483647;
-    width: 3.25rem;
-    height: 3.25rem;
+    height: 4rem;
+    padding: 0 1.35rem 0 0.85rem;
     border-radius: 9999px;
-    background-image: linear-gradient(to bottom right, #6366f1, #8b5cf6);
-    border: none;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.98), rgba(168, 85, 247, 0.98));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
     cursor: pointer;
-    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4), 0 4px 6px -4px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 12px 30px -4px rgba(99, 102, 241, 0.55), 0 8px 16px -4px rgba(168, 85, 247, 0.45);
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #ffffff;
+    outline: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+  }
+  #${BUTTON} .w2s-icon-wrapper {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    color: #ffffff;
-    padding: 0;
-    outline: 2px solid transparent;
-    overflow: hidden;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
   }
-  #${BUTTON} img {
-    width: 26px;
-    height: 26px;
+  #${BUTTON} img, #${BUTTON} svg {
+    width: 28px;
+    height: 28px;
     object-fit: contain;
     pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  #${BUTTON} .w2s-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    white-space: nowrap;
+    opacity: 1;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: opacity 0.2s ease;
   }
   #${BUTTON}:hover {
-    transform: scale(1.1) translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.5), 0 8px 10px -6px rgba(99, 102, 241, 0.5);
+    transform: translateY(-3px) scale(1.04);
+    box-shadow: 0 20px 35px -5px rgba(99, 102, 241, 0.6), 0 10px 15px -5px rgba(168, 85, 247, 0.5);
+    border-color: rgba(255, 255, 255, 0.45);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.98), rgba(147, 51, 234, 0.98));
+  }
+  #${BUTTON}:hover .w2s-icon-wrapper {
+    transform: rotate(12deg) scale(1.08);
   }
   #${BUTTON}:active {
-    transform: scale(0.95);
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 5px 15px -3px rgba(99, 102, 241, 0.4);
   }
   #${BUTTON}.ghe-loading {
-    animation: ghe-pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     pointer-events: none;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.9), rgba(124, 58, 237, 0.9));
   }
-  @keyframes ghe-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.6; transform: scale(0.96); }
+  #${BUTTON}.ghe-loading .w2s-icon-wrapper {
+    animation: w2s-spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+  @keyframes w2s-spin {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.15); }
+    100% { transform: rotate(360deg) scale(1); }
   }
   #${TOAST} {
     position: fixed;
-    bottom: 5.75rem;
-    left: 1.75rem;
+    bottom: 6rem;
+    left: 2rem;
     z-index: 2147483647;
-    background-color: #161b22;
+    background: rgba(22, 27, 34, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: #f3f4f6;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: 0.875rem 1.25rem;
+    border-radius: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.8125rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    transform: translateY(12px) scale(0.95);
+    pointer-events: none;
+    line-height: 1.4;
+  }
     font-size: 0.8125rem;
     max-width: 18rem;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5), 0 0 0 1px #30363d;
