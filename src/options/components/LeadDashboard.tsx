@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MESSAGE_TYPES } from '../../shared/constants';
 import type { MessageResponse } from '../../shared/types';
-import { SpinnerIcon, TrashIcon, RefreshIcon } from '../icons';
+import { SpinnerIcon, TrashIcon, RefreshIcon, EyeIcon, ExternalLinkIcon } from '../icons';
 
 interface LeadDashboardProps {
   githubSheetName: string;
@@ -22,6 +22,7 @@ export function LeadDashboard({
   const [error, setError] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
   const currentSheetName = activeTab === 'github' ? githubSheetName : linkedinSheetName;
 
@@ -79,9 +80,44 @@ export function LeadDashboard({
     }
   }, [activeTab, currentSheetName, isConfigured]);
 
+  const renderCellContent = (cellValue: string) => {
+    if (!cellValue) return <span className="text-[#484f58] italic">—</span>;
+
+    // Check if cell contains comma-separated URLs or text
+    if (cellValue.includes('http')) {
+      const parts = cellValue.split(',').map((p) => p.trim()).filter(Boolean);
+      return (
+        <div className="flex flex-wrap items-center gap-1.5 max-w-xs">
+          {parts.map((part, idx) => {
+            if (part.startsWith('http')) {
+              return (
+                <a
+                  key={idx}
+                  href={part}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 underline font-medium truncate max-w-[200px]"
+                  title={part}
+                >
+                  <span>{part.replace(/^https?:\/\/(www\.)?/, '')}</span>
+                  <ExternalLinkIcon size={12} className="shrink-0 opacity-75" />
+                </a>
+              );
+            }
+            return <span key={idx}>{part}</span>;
+          })}
+        </div>
+      );
+    }
+
+    return cellValue;
+  };
+
   if (!isConfigured) {
     return null;
   }
+
+  const selectedRow = selectedRowIndex !== null ? rows[selectedRowIndex] : null;
 
   return (
     <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 flex flex-col gap-5 shadow-lg shadow-black/20">
@@ -103,7 +139,7 @@ export function LeadDashboard({
         <div className="flex items-center gap-2">
           <div className="inline-flex p-1 bg-[#0d1117] border border-[#30363d] rounded-lg">
             <button
-              onClick={() => setActiveTab('github')}
+              onClick={() => { setActiveTab('github'); setSelectedRowIndex(null); }}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 activeTab === 'github'
                   ? 'bg-indigo-600 text-white shadow-sm'
@@ -113,7 +149,7 @@ export function LeadDashboard({
               GitHub
             </button>
             <button
-              onClick={() => setActiveTab('linkedin')}
+              onClick={() => { setActiveTab('linkedin'); setSelectedRowIndex(null); }}
               className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                 activeTab === 'linkedin'
                   ? 'bg-blue-600 text-white shadow-sm'
@@ -200,6 +236,7 @@ export function LeadDashboard({
           <table className="w-full text-left text-xs whitespace-nowrap">
             <thead className="bg-[#0d1117] border-b border-[#30363d] text-[11px] font-semibold uppercase tracking-wider text-[#8b949e] sticky top-0 z-10">
               <tr>
+                <th className="px-4 py-3 text-center w-14">Action</th>
                 <th className="px-4 py-3 text-center w-10">#</th>
                 {headers.map((h, i) => (
                   <th key={i} className="px-4 py-3">{h}</th>
@@ -209,25 +246,19 @@ export function LeadDashboard({
             <tbody className="divide-y divide-[#21262d] text-[#e6edf3]">
               {rows.map((row, rIdx) => (
                 <tr key={rIdx} className="hover:bg-white/5 transition-colors">
+                  <td className="px-3 py-2.5 text-center">
+                    <button
+                      onClick={() => setSelectedRowIndex(rIdx)}
+                      title="Preview lead details"
+                      className="p-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 rounded-lg transition-colors inline-flex items-center justify-center"
+                    >
+                      <EyeIcon size={14} />
+                    </button>
+                  </td>
                   <td className="px-4 py-2.5 text-center text-[#8b949e] font-mono text-[11px]">{rIdx + 1}</td>
                   {headers.map((_, cIdx) => (
                     <td key={cIdx} className="px-4 py-2.5 max-w-xs truncate">
-                      {row[cIdx] ? (
-                        row[cIdx].startsWith('http') ? (
-                          <a
-                            href={row[cIdx]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-indigo-400 hover:text-indigo-300 underline"
-                          >
-                            {row[cIdx]}
-                          </a>
-                        ) : (
-                          row[cIdx]
-                        )
-                      ) : (
-                        <span className="text-[#484f58] italic">—</span>
-                      )}
+                      {renderCellContent(row[cIdx])}
                     </td>
                   ))}
                 </tr>
@@ -236,6 +267,98 @@ export function LeadDashboard({
           </table>
         )}
       </div>
+
+      {/* ── Single Lead Preview Modal ── */}
+      {selectedRow !== null && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#161b22] border border-[#30363d] rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Top Bar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#21262d] bg-[#0d1117]">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs ${
+                  activeTab === 'linkedin' ? 'bg-blue-600' : 'bg-indigo-600'
+                }`}>
+                  {activeTab === 'linkedin' ? 'li' : 'gh'}
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-[#e6edf3]">Lead Details Preview</h3>
+                  <p className="text-[11px] text-[#8b949e]">Record #{selectedRowIndex! + 1} from {currentSheetName}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedRowIndex(null)}
+                className="w-7 h-7 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-[#8b949e] hover:text-[#e6edf3] flex items-center justify-center text-sm font-bold transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex flex-col gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {headers.map((header, idx) => {
+                  const val = selectedRow[idx] || '';
+                  const isLongText = header.toLowerCase().includes('about') || header.toLowerCase().includes('bio') || header.toLowerCase().includes('notes');
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-3.5 bg-[#0d1117] border border-[#21262d] rounded-xl flex flex-col gap-1.5 ${
+                        isLongText ? 'md:col-span-2' : ''
+                      }`}
+                    >
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]">
+                        {header}
+                      </span>
+                      <div className="text-xs text-[#e6edf3] break-words whitespace-pre-wrap">
+                        {val ? (
+                          val.includes('http') ? (
+                            <div className="flex flex-col gap-1">
+                              {val.split(',').map((link, lIdx) => {
+                                const trimmed = link.trim();
+                                if (trimmed.startsWith('http')) {
+                                  return (
+                                    <a
+                                      key={lIdx}
+                                      href={trimmed}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 underline font-medium"
+                                    >
+                                      <span>{trimmed}</span>
+                                      <ExternalLinkIcon size={12} className="shrink-0" />
+                                    </a>
+                                  );
+                                }
+                                return <span key={lIdx}>{trimmed}</span>;
+                              })}
+                            </div>
+                          ) : (
+                            val
+                          )
+                        ) : (
+                          <span className="text-[#484f58] italic">—</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 border-t border-[#21262d] bg-[#0d1117] flex justify-end">
+              <button
+                onClick={() => setSelectedRowIndex(null)}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-colors shadow-sm"
+              >
+                Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
