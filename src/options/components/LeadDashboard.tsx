@@ -184,7 +184,7 @@ export function LeadDashboard({
       )}
 
       {/* Table Container */}
-      <div className="border border-[#30363d] rounded-xl overflow-x-auto max-h-[480px]">
+      <div className="border border-[#30363d] rounded-xl overflow-x-auto max-h-[70vh] min-h-[400px]">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-xs text-[#8b949e] gap-2">
             <SpinnerIcon size={18} /> Loading {currentSheetName} data…

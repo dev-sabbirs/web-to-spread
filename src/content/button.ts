@@ -33,7 +33,7 @@ async function handleClick(): Promise<void> {
   showToast('🔍 Extracting…', 'info', 10_000);
 
   const emails = extractEmails();
-  const profile = extractProfile();
+  const profile = await extractProfile();
 
   const primaryEmail = emails[0] || '';
   const secondaryEmails = emails.slice(1).join(', ');

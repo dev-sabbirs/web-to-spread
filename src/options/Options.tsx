@@ -22,7 +22,7 @@ export default function Options() {
         onSelectTab={(tab) => setActiveTab(tab as TabId)}
       />
 
-      <main className="flex-1 min-w-0 p-6 md:p-12 max-w-5xl">
+      <main className="flex-1 min-w-0 p-6 md:p-10 w-full">
         {/* Not-configured banner */}
         {!hook.isConfigured && activeTab !== 'settings' && (
           <div className="flex items-start justify-between gap-3 p-4 mb-8 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs leading-relaxed" role="alert">

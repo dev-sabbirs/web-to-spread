@@ -27,7 +27,7 @@ export function extractEmails(): string[] {
 }
 
 /** Scrape profile fields from the current page (GitHub or LinkedIn). */
-export function extractProfile(): ExtractedProfile {
+export async function extractProfile(): Promise<ExtractedProfile> {
   const isLinkedIn = window.location.hostname.includes('linkedin.com');
   if (isLinkedIn) {
     return extractLinkedInProfile();
@@ -56,7 +56,17 @@ function extractGitHubProfile(): ExtractedProfile {
   };
 }
 
-function extractLinkedInProfile(): ExtractedProfile {
+export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
+  // If contact info popup button is present and modal is not already open, click it automatically
+  const contactInfoBtn = document.querySelector<HTMLElement>('#top-card-text-details-contact-info, a[href*="/overlay/contact-info/"]');
+  const isModalOpen = !!document.querySelector('.pv-contact-info__contact-type, .artdeco-modal[role="dialog"]');
+
+  if (contactInfoBtn && !isModalOpen) {
+    contactInfoBtn.click();
+    // Wait briefly for modal to render in DOM
+    await new Promise((resolve) => setTimeout(resolve, 600));
+  }
+
   const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li', '.pv-text-details__left-panel h1');
   const headline = first(
     '.text-body-medium[data-generated-suggestion-target]',
@@ -79,8 +89,14 @@ function extractLinkedInProfile(): ExtractedProfile {
   // Extract full "About" section text
   const about = extractLinkedInAbout();
 
-  // Extract website & contact links
+  // Extract website & contact links (modal is now open)
   const website = extractLinkedInWebsite();
+
+  // Close modal automatically if we opened it
+  const closeBtn = document.querySelector<HTMLElement>('.artdeco-modal__dismiss, button[aria-label="Dismiss"], button[aria-label="Close"]');
+  if (closeBtn && contactInfoBtn && !isModalOpen) {
+    closeBtn.click();
+  }
 
   // Extract handle/username from LinkedIn URL (e.g. linkedin.com/in/john-doe)
   const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -113,16 +129,37 @@ function extractLinkedInAbout(): string {
 }
 
 function extractLinkedInWebsite(): string {
-  // Check main website links on profile
-  const mainSite = document.querySelector<HTMLAnchorElement>('.pv-top-card--experience-list a[href*="http"], a[id*="top-card-primary-button"]');
-  if (mainSite?.href) return mainSite.href;
+  const websites: string[] = [];
 
-  // Contact info popup / section links
-  const contactLinks = document.querySelectorAll<HTMLAnchorElement>('.pv-contact-info__contact-type.ci-websites a, a[href*="http"]:not([href*="linkedin.com"])');
-  for (const a of contactLinks) {
-    if (a.href && !a.href.includes('linkedin.com')) return a.href;
+  // 1. Check open Contact Info modal links (e.g. .pv-contact-info__contact-type.ci-websites a)
+  const modalWebsites = document.querySelectorAll<HTMLAnchorElement>(
+    '.pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, a[href*="http"]:not([href*="linkedin.com"])'
+  );
+  modalWebsites.forEach((a) => {
+    const href = a.href || a.getAttribute('href') || '';
+    if (href && !href.includes('linkedin.com') && !href.startsWith('javascript:') && !websites.includes(href)) {
+      websites.push(href);
+    }
+  });
+
+  // 2. Check main top-card website buttons/links (e.g. "Visit my website", custom link button)
+  const topCardSites = document.querySelectorAll<HTMLAnchorElement>(
+    '.pv-top-card--experience-list a[href*="http"], a[id*="top-card-primary-button"], a[aria-label*="Website"], a.pv-top-card--website'
+  );
+  topCardSites.forEach((a) => {
+    const href = a.href || a.getAttribute('href') || '';
+    if (href && !href.includes('linkedin.com') && !href.startsWith('javascript:') && !websites.includes(href)) {
+      websites.push(href);
+    }
+  });
+
+  // 3. Fallback: Any external link inside main profile container
+  if (websites.length === 0) {
+    const fallbackLink = document.querySelector<HTMLAnchorElement>('.scaffold-layout__main a[href*="http"]:not([href*="linkedin.com"])');
+    if (fallbackLink?.href) return fallbackLink.href;
   }
-  return first('li[itemprop="url"] a');
+
+  return websites.join(', ');
 }
 
 function extractLinkedInTwitter(): string {
