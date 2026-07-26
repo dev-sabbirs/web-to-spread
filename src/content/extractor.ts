@@ -57,14 +57,16 @@ function extractGitHubProfile(): ExtractedProfile {
 }
 
 export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
-  // If contact info popup button is present and modal is not already open, click it automatically
-  const contactInfoBtn = document.querySelector<HTMLElement>('#top-card-text-details-contact-info, a[href*="/overlay/contact-info/"]');
-  const isModalOpen = !!document.querySelector('.pv-contact-info__contact-type, .artdeco-modal[role="dialog"]');
+  // Find contact info button on LinkedIn profile
+  const contactInfoBtn = document.querySelector<HTMLElement>(
+    '#top-card-text-details-contact-info, a[href*="/overlay/contact-info/"], a[id*="contact-info"]'
+  );
+  const isModalOpen = !!document.querySelector('.pv-contact-info__contact-type, .artdeco-modal[role="dialog"], .pv-contact-info__header');
 
   if (contactInfoBtn && !isModalOpen) {
     contactInfoBtn.click();
-    // Wait briefly for modal to render in DOM
-    await new Promise((resolve) => setTimeout(resolve, 600));
+    // Increase wait time to 1200ms so LinkedIn SPA has ample time to fetch modal payload over network
+    await new Promise((resolve) => setTimeout(resolve, 1200));
   }
 
   const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li', '.pv-text-details__left-panel h1');
@@ -93,7 +95,7 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
   const website = extractLinkedInWebsite();
 
   // Close modal automatically if we opened it
-  const closeBtn = document.querySelector<HTMLElement>('.artdeco-modal__dismiss, button[aria-label="Dismiss"], button[aria-label="Close"]');
+  const closeBtn = document.querySelector<HTMLElement>('.artdeco-modal__dismiss, button[aria-label="Dismiss"], button[aria-label="Close"], button.artdeco-modal__dismiss');
   if (closeBtn && contactInfoBtn && !isModalOpen) {
     closeBtn.click();
   }
@@ -131,11 +133,11 @@ function extractLinkedInAbout(): string {
 function extractLinkedInWebsite(): string {
   const websites: string[] = [];
 
-  // 1. Check open Contact Info modal links (e.g. .pv-contact-info__contact-type.ci-websites a)
-  const modalWebsites = document.querySelectorAll<HTMLAnchorElement>(
-    '.pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, a[href*="http"]:not([href*="linkedin.com"])'
+  // 1. Check open Contact Info modal links (e.g. .pv-contact-info__contact-type, .ci-websites, modal container)
+  const modalLinks = document.querySelectorAll<HTMLAnchorElement>(
+    '.pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, .ci-websites a[href], .artdeco-modal a[href*="http"]'
   );
-  modalWebsites.forEach((a) => {
+  modalLinks.forEach((a) => {
     const href = a.href || a.getAttribute('href') || '';
     if (href && !href.includes('linkedin.com') && !href.startsWith('javascript:') && !websites.includes(href)) {
       websites.push(href);
