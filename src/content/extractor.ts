@@ -57,51 +57,63 @@ function extractGitHubProfile(): ExtractedProfile {
 }
 
 export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
-  // Find contact info button on LinkedIn profile
-  const contactInfoBtn = document.querySelector<HTMLElement>(
-    '#top-card-text-details-contact-info, a[href*="/overlay/contact-info/"], a[id*="contact-info"]'
-  );
-  const isModalOpen = !!document.querySelector('.pv-contact-info__contact-type, .artdeco-modal[role="dialog"], .pv-contact-info__header');
-
-  if (contactInfoBtn && !isModalOpen) {
-    contactInfoBtn.click();
-    // Increase wait time to 1200ms so LinkedIn SPA has ample time to fetch modal payload over network
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-  }
-
+  // 1. Scrape top card fields from the MAIN PAGE DOM FIRST before clicking contact info modal
   const name = first(
     'h1.text-heading-xlarge',
     'h1.inline',
-    'h2._687a5045',
     'a[href*="/overlay/contact-info/"] h2',
-    '.pv-top-card--list li',
-    '.pv-text-details__left-panel h1'
+    '.pv-text-details__left-panel h1',
+    'h2._687a5045'
   );
+
   const headline = first(
     '.text-body-medium[data-generated-suggestion-target]',
-    '.pv-top-card--list-bullet .text-body-medium',
-    '.pv-text-details__left-panel .text-body-medium',
-    'div[data-test-id="headline"]',
     'p._8c535ff6',
-    'a[href*="/overlay/contact-info/"] ~ p'
+    '.pv-text-details__left-panel .text-body-medium',
+    '.pv-top-card--list-bullet .text-body-medium',
+    'div[data-test-id="headline"]'
   );
+
   const location = first(
+    'p._3ab7a3ad',
     '.pb5 .text-body-small.inline',
     '.pv-top-card--list-bullet + div .text-body-small',
-    '.pv-text-details__left-panel .text-body-small',
-    'p._3ab7a3ad'
+    '.pv-text-details__left-panel .text-body-small'
   );
+
   const company = extractLinkedInCompany();
-  const connectionDegree = first('.dist-value', 'span.distance-badge', 'p._a1e2d8b2');
+
+  // Degree badge (1st, 2nd, 3rd)
+  const connectionDegreeEl = Array.from(document.querySelectorAll('p, span')).find((el) =>
+    /^(·\s*)?(1st|2nd|3rd)$/i.test(el.textContent?.trim() || '')
+  );
+  const connectionDegree = connectionDegreeEl ? connectionDegreeEl.textContent?.replace(/^·\s*/, '').trim() || '' : '';
+
+  // Followers (e.g. "10,279 followers")
+  const followersEl = Array.from(document.querySelectorAll('p, span, a')).find((el) =>
+    /\d+([,.]\d+)?\s+followers/i.test(el.textContent || '')
+  );
+  const followers = followersEl ? followersEl.textContent?.trim() || '' : '';
 
   // Extract full "About" section text
   const about = extractLinkedInAbout();
 
-  // Extract website & contact links (modal is now open)
+  // 2. NOW click contact info button to extract emails & external websites from the overlay modal
+  const contactInfoBtn = document.querySelector<HTMLElement>(
+    '#top-card-text-details-contact-info, a[href*="/overlay/contact-info/"]'
+  );
+  const isModalOpen = !!document.querySelector('.pv-contact-info__contact-type, .artdeco-modal[role="dialog"], [data-testid="lazy-column"]');
+
+  if (contactInfoBtn && !isModalOpen) {
+    contactInfoBtn.click();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  // Extract website & contact links from modal
   const website = extractLinkedInWebsite();
 
   // Close modal automatically if we opened it
-  const closeBtn = document.querySelector<HTMLElement>('.artdeco-modal__dismiss, button[aria-label="Dismiss"], button[aria-label="Close"], button.artdeco-modal__dismiss');
+  const closeBtn = document.querySelector<HTMLElement>('.artdeco-modal__dismiss, button[aria-label="Dismiss"], button[aria-label="Close"]');
   if (closeBtn && contactInfoBtn && !isModalOpen) {
     closeBtn.click();
   }
@@ -126,7 +138,7 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
     location,
     website,
     linkedin: cleanLinkedinUrl,
-    followers: first('span.pvs-header__optional-link span', '.pv-recent-activity-section__follower-count'),
+    followers,
     connectionDegree,
     notes: '',
   };
