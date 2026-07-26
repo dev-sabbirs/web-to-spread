@@ -26,9 +26,18 @@ export function extractEmails(): string[] {
   return Array.from(found).filter(isValidEmail);
 }
 
-/** Scrape GitHub profile fields from the sidebar DOM. */
+/** Scrape profile fields from the current page (GitHub or LinkedIn). */
 export function extractProfile(): ExtractedProfile {
+  const isLinkedIn = window.location.hostname.includes('linkedin.com');
+  if (isLinkedIn) {
+    return extractLinkedInProfile();
+  }
+  return extractGitHubProfile();
+}
+
+function extractGitHubProfile(): ExtractedProfile {
   return {
+    platform: 'github',
     username: window.location.pathname.split('/').filter(Boolean)[0] ?? '',
     name: first('span[itemprop="name"]', 'h1.vcard-fullname', '.p-name'),
     company: extractCompany(),
@@ -44,6 +53,35 @@ export function extractProfile(): ExtractedProfile {
     followers: extractCount('a[href$="?tab=followers"] .Counter', 'a[href*="tab=followers"]'),
     following: extractCount('a[href$="?tab=following"] .Counter', 'a[href*="tab=following"]'),
     repositoriesCount: extractCount('a[href$="?tab=repositories"] .Counter', 'span[data-tab-item="repositories"] .Counter'),
+  };
+}
+
+function extractLinkedInProfile(): ExtractedProfile {
+  const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li');
+  const headline = first('.text-body-medium[data-generated-suggestion-target]', '.pv-top-card--list-bullet .text-body-medium');
+  const location = first('.pb5 .text-body-small.inline', '.pv-top-card--list-bullet + div .text-body-small');
+  const company = first('.pv-text-details__right-panel span', 'button[aria-label*="Current company"] span');
+  const connectionDegree = first('.dist-value', 'span.distance-badge');
+
+  // Extract handle/username from LinkedIn URL (e.g. linkedin.com/in/john-doe)
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  const username = pathParts[pathParts.indexOf('in') + 1] || pathParts[0] || '';
+
+  return {
+    platform: 'linkedin',
+    username,
+    name,
+    headline,
+    company,
+    bio: headline, // headline serves as bio for LinkedIn leads
+    location,
+    website: extractWebsite(),
+    twitter: '',
+    linkedin: window.location.href,
+    followers: '',
+    following: '',
+    repositoriesCount: '',
+    connectionDegree,
   };
 }
 

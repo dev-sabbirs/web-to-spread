@@ -7,7 +7,9 @@ export const MESSAGE_TYPES = {
 
 export const STORAGE_KEYS = {
   APPS_SCRIPT_URL: 'appsScriptUrl',
-  SHEET_NAME: 'sheetName',
+  SHEET_NAME: 'sheetName', // legacy / default sheet
+  GITHUB_SHEET_NAME: 'githubSheetName',
+  LINKEDIN_SHEET_NAME: 'linkedinSheetName',
 } as const;
 
 export const ELEMENT_IDS = {
@@ -28,3 +30,5 @@ export const EMAIL_SKIP_DOMAINS = [
 
 export const APPS_SCRIPT_URL_PREFIX = 'https://script.google.com/macros/s/';
 export const DEFAULT_SHEET_NAME = 'Leads';
+export const DEFAULT_GITHUB_SHEET_NAME = 'GitHub Leads';
+export const DEFAULT_LINKEDIN_SHEET_NAME = 'LinkedIn Leads';

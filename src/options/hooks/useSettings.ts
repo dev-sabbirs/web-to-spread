@@ -1,19 +1,15 @@
 // Custom hook — owns all options page state and chrome.storage interactions.
 
 import { useState, useEffect, useCallback } from 'react';
-import { getSettings, saveSettings } from '../../shared/storage';
+import { getSettings, saveSettings, type StoredSettings } from '../../shared/storage';
 import { APPS_SCRIPT_URL_PREFIX, MESSAGE_TYPES } from '../../shared/constants';
 import type { SaveState, TestState, MessageResponse } from '../../shared/types';
 
-export interface Settings {
-  appsScriptUrl: string;
-  sheetName: string;
-}
-
 export interface UseSettingsReturn {
-  settings: Settings;
+  settings: StoredSettings;
   updateUrl: (v: string) => void;
-  updateSheetName: (v: string) => void;
+  updateGithubSheetName: (v: string) => void;
+  updateLinkedinSheetName: (v: string) => void;
   save: () => Promise<void>;
   saveState: SaveState;
   saveMsg: string;
@@ -25,7 +21,12 @@ export interface UseSettingsReturn {
 }
 
 export function useSettings(): UseSettingsReturn {
-  const [settings, setSettings] = useState<Settings>({ appsScriptUrl: '', sheetName: 'Leads' });
+  const [settings, setSettings] = useState<StoredSettings>({
+    appsScriptUrl: '',
+    sheetName: 'Leads',
+    githubSheetName: 'GitHub Leads',
+    linkedinSheetName: 'LinkedIn Leads',
+  });
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMsg, setSaveMsg] = useState('');
   const [testState, setTestState] = useState<TestState>('idle');
@@ -34,11 +35,15 @@ export function useSettings(): UseSettingsReturn {
   useEffect(() => { getSettings().then(setSettings); }, []);
 
   const updateUrl = useCallback((appsScriptUrl: string) => {
-    setSettings((p) => ({ ...p, appsScriptUrl }));
+    setSettings((p: StoredSettings) => ({ ...p, appsScriptUrl }));
   }, []);
 
-  const updateSheetName = useCallback((sheetName: string) => {
-    setSettings((p) => ({ ...p, sheetName }));
+  const updateGithubSheetName = useCallback((githubSheetName: string) => {
+    setSettings((p: StoredSettings) => ({ ...p, githubSheetName }));
+  }, []);
+
+  const updateLinkedinSheetName = useCallback((linkedinSheetName: string) => {
+    setSettings((p: StoredSettings) => ({ ...p, linkedinSheetName }));
   }, []);
 
   const save = useCallback(async () => {
@@ -81,7 +86,8 @@ export function useSettings(): UseSettingsReturn {
   return {
     settings,
     updateUrl,
-    updateSheetName,
+    updateGithubSheetName,
+    updateLinkedinSheetName,
     save,
     saveState,
     saveMsg,

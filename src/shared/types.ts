@@ -1,8 +1,12 @@
 // Shared TypeScript interfaces and union types used across all extension contexts.
 
+export type Platform = 'github' | 'linkedin';
+
 export interface ExtractedProfile {
+  platform: Platform;
   username: string;
   name: string;
+  headline?: string;
   company: string;
   bio: string;
   location: string;
@@ -12,6 +16,7 @@ export interface ExtractedProfile {
   followers: string;
   following: string;
   repositoriesCount: string;
+  connectionDegree?: string;
 }
 
 export interface ExtractedData extends ExtractedProfile {
@@ -20,6 +25,7 @@ export interface ExtractedData extends ExtractedProfile {
   primaryEmail: string;
   secondaryEmails: string;
   emails: string[];
+  targetSheetName?: string;
 }
 
 // ─── Chrome Extension Messages ────────────────────────────────────────────────

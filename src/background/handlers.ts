@@ -1,6 +1,11 @@
 // Background message handlers — all chrome.storage reads and outbound fetches live here.
 
-import { STORAGE_KEYS, DEFAULT_SHEET_NAME } from '../shared/constants';
+import {
+  STORAGE_KEYS,
+  DEFAULT_SHEET_NAME,
+  DEFAULT_GITHUB_SHEET_NAME,
+  DEFAULT_LINKEDIN_SHEET_NAME,
+} from '../shared/constants';
 import type { ExtractedData, MessageResponse } from '../shared/types';
 
 // ─── Public Handlers ──────────────────────────────────────────────────────────
@@ -13,16 +18,24 @@ export async function handleSendToSheet(payload: ExtractedData): Promise<Message
   const stored = await chrome.storage.sync.get([
     STORAGE_KEYS.APPS_SCRIPT_URL,
     STORAGE_KEYS.SHEET_NAME,
+    STORAGE_KEYS.GITHUB_SHEET_NAME,
+    STORAGE_KEYS.LINKEDIN_SHEET_NAME,
   ]);
 
   const scriptUrl = stored[STORAGE_KEYS.APPS_SCRIPT_URL] as string | undefined;
-  const sheetName = (stored[STORAGE_KEYS.SHEET_NAME] as string) || DEFAULT_SHEET_NAME;
 
   if (!scriptUrl) {
     return {
       success: false,
       error: 'No Apps Script URL set. Right-click the extension icon → Options.',
     };
+  }
+
+  let sheetName = (stored[STORAGE_KEYS.SHEET_NAME] as string) || DEFAULT_SHEET_NAME;
+  if (payload.platform === 'linkedin') {
+    sheetName = (stored[STORAGE_KEYS.LINKEDIN_SHEET_NAME] as string) || DEFAULT_LINKEDIN_SHEET_NAME;
+  } else if (payload.platform === 'github') {
+    sheetName = (stored[STORAGE_KEYS.GITHUB_SHEET_NAME] as string) || DEFAULT_GITHUB_SHEET_NAME;
   }
 
   return postToScript(scriptUrl, { ...payload, sheetName });

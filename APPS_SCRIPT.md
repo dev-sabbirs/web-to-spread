@@ -34,7 +34,10 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    const sheetName = data.sheetName || 'Leads';
+    const platform = data.platform || 'github';
+    const defaultTabName = platform === 'linkedin' ? 'LinkedIn Leads' : 'GitHub Leads';
+    const sheetName = data.sheetName || defaultTabName;
+
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName(sheetName);
 
@@ -42,31 +45,46 @@ function doPost(e) {
       sheet = ss.insertSheet(sheetName);
     }
 
-    // Define standard structured column headers
-    const headers = [
-      'Timestamp',
-      'Username',
-      'Full Name',
-      'Company',
-      'Primary Email',
-      'Secondary Emails',
-      'Bio',
-      'Location',
-      'Website',
-      'Twitter / X',
-      'LinkedIn',
-      'Repositories',
-      'Followers',
-      'Following',
-      'GitHub URL'
-    ];
+    // Platform-specific headers
+    const isLinkedIn = platform === 'linkedin';
+    const headers = isLinkedIn
+      ? [
+          'Timestamp',
+          'Name',
+          'Headline / Bio',
+          'Company',
+          'Location',
+          'Primary Email',
+          'Secondary Emails',
+          'LinkedIn Profile URL',
+          'Website',
+          'Connection Degree',
+          'Source Platform'
+        ]
+      : [
+          'Timestamp',
+          'Username',
+          'Full Name',
+          'Company',
+          'Primary Email',
+          'Secondary Emails',
+          'Bio',
+          'Location',
+          'Website',
+          'Twitter / X',
+          'LinkedIn',
+          'Repositories',
+          'Followers',
+          'Following',
+          'GitHub URL'
+        ];
 
     // Create header row if sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(headers);
       sheet.getRange(1, 1, 1, headers.length)
         .setFontWeight('bold')
-        .setBackground('#1a73e8')
+        .setBackground(isLinkedIn ? '#0a66c2' : '#1a73e8')
         .setFontColor('#ffffff');
       sheet.setFrozenRows(1);
     }
@@ -75,23 +93,37 @@ function doPost(e) {
     const secondaryEmails = data.secondaryEmails || (data.emails && data.emails.slice(1).join(', ')) || '';
 
     // Append structured lead record
-    const row = [
-      data.timestamp || new Date().toISOString(),
-      data.username || '',
-      data.name || '',
-      data.company || '',
-      primaryEmail,
-      secondaryEmails,
-      data.bio || '',
-      data.location || '',
-      data.website || '',
-      data.twitter || '',
-      data.linkedin || '',
-      data.repositoriesCount || '',
-      data.followers || '',
-      data.following || '',
-      data.url || ''
-    ];
+    const row = isLinkedIn
+      ? [
+          data.timestamp || new Date().toISOString(),
+          data.name || '',
+          data.headline || data.bio || '',
+          data.company || '',
+          data.location || '',
+          primaryEmail,
+          secondaryEmails,
+          data.url || data.linkedin || '',
+          data.website || '',
+          data.connectionDegree || '',
+          'LinkedIn'
+        ]
+      : [
+          data.timestamp || new Date().toISOString(),
+          data.username || '',
+          data.name || '',
+          data.company || '',
+          primaryEmail,
+          secondaryEmails,
+          data.bio || '',
+          data.location || '',
+          data.website || '',
+          data.twitter || '',
+          data.linkedin || '',
+          data.repositoriesCount || '',
+          data.followers || '',
+          data.following || '',
+          data.url || ''
+        ];
 
     sheet.appendRow(row);
 

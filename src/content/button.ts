@@ -56,7 +56,8 @@ async function handleClick(): Promise<void> {
 
     if (response?.success) {
       const emailLine = buildEmailLine(emails);
-      showToast(`✅ @${profile.username || 'user'} saved\n${emailLine}`, 'success', 6_000);
+      const platformLabel = profile.platform === 'linkedin' ? 'LinkedIn' : 'GitHub';
+      showToast(`✅ ${platformLabel} lead @${profile.username || profile.name || 'user'} saved\n${emailLine}`, 'success', 6_000);
     } else {
       const errMsg = response?.error ?? 'Failed — open extension Options to check your URL.';
       showToast(`❌ ${errMsg}`, 'error', 7_000);

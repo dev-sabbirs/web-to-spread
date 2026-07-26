@@ -33,7 +33,8 @@ export default function Options() {
           </div>
           <ConfigCard
             url={hook.settings.appsScriptUrl}
-            sheetName={hook.settings.sheetName}
+            githubSheetName={hook.settings.githubSheetName}
+            linkedinSheetName={hook.settings.linkedinSheetName}
             isValidUrl={hook.isValidUrl}
             isConfigured={hook.isConfigured}
             saveState={hook.saveState}
@@ -41,7 +42,8 @@ export default function Options() {
             testState={hook.testState}
             testMsg={hook.testMsg}
             onUrlChange={hook.updateUrl}
-            onSheetNameChange={hook.updateSheetName}
+            onGithubSheetNameChange={hook.updateGithubSheetName}
+            onLinkedinSheetNameChange={hook.updateLinkedinSheetName}
             onSave={hook.save}
             onTest={hook.testConnection}
           />

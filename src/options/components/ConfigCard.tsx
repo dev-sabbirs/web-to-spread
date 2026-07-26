@@ -4,7 +4,8 @@ import type { SaveState, TestState } from '../../shared/types';
 
 interface ConfigCardProps {
   url: string;
-  sheetName: string;
+  githubSheetName: string;
+  linkedinSheetName: string;
   isValidUrl: boolean;
   isConfigured: boolean;
   saveState: SaveState;
@@ -12,15 +13,16 @@ interface ConfigCardProps {
   testState: TestState;
   testMsg: string;
   onUrlChange: (v: string) => void;
-  onSheetNameChange: (v: string) => void;
+  onGithubSheetNameChange: (v: string) => void;
+  onLinkedinSheetNameChange: (v: string) => void;
   onSave: () => void;
   onTest: () => void;
 }
 
 export function ConfigCard({
-  url, sheetName, isValidUrl, isConfigured,
+  url, githubSheetName, linkedinSheetName, isValidUrl, isConfigured,
   saveState, saveMsg, testState, testMsg,
-  onUrlChange, onSheetNameChange, onSave, onTest,
+  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onSave, onTest,
 }: ConfigCardProps) {
   const isTesting = testState === 'testing';
   const isSaving  = saveState === 'saving';
@@ -85,20 +87,37 @@ export function ConfigCard({
         </p>
       </div>
 
-      {/* Sheet name */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="sheet-name">
-          Sheet Tab Name
-        </label>
-        <input
-          id="sheet-name"
-          type="text"
-          className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
-          placeholder="Leads"
-          value={sheetName}
-          onChange={(e) => onSheetNameChange(e.target.value)}
-        />
-        <p className="text-xs text-[#8b949e]">Must exactly match the tab name in your spreadsheet.</p>
+      {/* Sheet tab names */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="github-sheet-name">
+            GitHub Leads Tab
+          </label>
+          <input
+            id="github-sheet-name"
+            type="text"
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            placeholder="GitHub Leads"
+            value={githubSheetName}
+            onChange={(e) => onGithubSheetNameChange(e.target.value)}
+          />
+          <p className="text-xs text-[#8b949e]">Target tab for GitHub profiles.</p>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="linkedin-sheet-name">
+            LinkedIn Leads Tab
+          </label>
+          <input
+            id="linkedin-sheet-name"
+            type="text"
+            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            placeholder="LinkedIn Leads"
+            value={linkedinSheetName}
+            onChange={(e) => onLinkedinSheetNameChange(e.target.value)}
+          />
+          <p className="text-xs text-[#8b949e]">Target tab for LinkedIn profiles.</p>
+        </div>
       </div>
 
       {/* Actions */}
