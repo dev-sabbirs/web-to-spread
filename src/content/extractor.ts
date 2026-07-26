@@ -144,25 +144,51 @@ function extractLinkedInWebsite(): string {
     return href;
   };
 
-  // 1. Check all links inside contact modal (both legacy and new LazyColumn modal structure)
-  const modalLinks = document.querySelectorAll<HTMLAnchorElement>(
-    '[data-testid="lazy-column"] a[href], .pv-contact-info__contact-type a[href], .pv-contact-info__contact-link, .ci-websites a[href], .artdeco-modal a[href*="http"]'
-  );
+  const isExcludedLink = (url: string): boolean => {
+    if (!url || url.startsWith('javascript:')) return true;
+    const lower = url.toLowerCase();
 
-  modalLinks.forEach((a) => {
-    const rawHref = a.href || a.getAttribute('href') || '';
-    const cleanUrl = parseRealUrl(rawHref);
-
-    if (
-      cleanUrl &&
-      !cleanUrl.includes('linkedin.com/in/') &&
-      !cleanUrl.includes('mailto:') &&
-      !cleanUrl.startsWith('javascript:') &&
-      !websites.includes(cleanUrl)
-    ) {
-      websites.push(cleanUrl);
+    // Skip all internal LinkedIn application links
+    if (lower.includes('linkedin.com/')) {
+      if (
+        lower.includes('linkedin.com/feed') ||
+        lower.includes('linkedin.com/pulse') ||
+        lower.includes('linkedin.com/premium') ||
+        lower.includes('linkedin.com/search') ||
+        lower.includes('linkedin.com/messaging') ||
+        lower.includes('linkedin.com/newsletters') ||
+        lower.includes('linkedin.com/in/') ||
+        lower.includes('linkedin.com/company/')
+      ) {
+        return true;
+      }
     }
-  });
+
+    return false;
+  };
+
+  // 1. Prioritize explicit Website container inside contact info modal (ci-websites / Website header)
+  const contactModal = document.querySelector('[data-testid="lazy-column"], .pv-contact-info__contact-type, .artdeco-modal');
+  if (contactModal) {
+    // Look specifically for website section links
+    const websiteItems = contactModal.querySelectorAll<HTMLAnchorElement>('.ci-websites a[href], [componentkey*="link"] a[href], a[href*="safety/go/"]');
+    websiteItems.forEach((a) => {
+      const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
+      if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
+        websites.push(cleanUrl);
+      }
+    });
+
+    // If still no website found from explicit selectors, check modal links
+    if (websites.length === 0) {
+      contactModal.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+        const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
+        if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
+          websites.push(cleanUrl);
+        }
+      });
+    }
+  }
 
   // 2. Check main top-card website buttons/links (e.g. "Visit my website", custom link button)
   const topCardSites = document.querySelectorAll<HTMLAnchorElement>(
@@ -170,21 +196,10 @@ function extractLinkedInWebsite(): string {
   );
   topCardSites.forEach((a) => {
     const cleanUrl = parseRealUrl(a.href || a.getAttribute('href') || '');
-    if (
-      cleanUrl &&
-      !cleanUrl.includes('linkedin.com/in/') &&
-      !cleanUrl.startsWith('javascript:') &&
-      !websites.includes(cleanUrl)
-    ) {
+    if (!isExcludedLink(cleanUrl) && !websites.includes(cleanUrl)) {
       websites.push(cleanUrl);
     }
   });
-
-  // 3. Fallback: Any external link inside main profile container
-  if (websites.length === 0) {
-    const fallbackLink = document.querySelector<HTMLAnchorElement>('.scaffold-layout__main a[href*="http"]:not([href*="linkedin.com"])');
-    if (fallbackLink?.href) return parseRealUrl(fallbackLink.href);
-  }
 
   return websites.join(', ');
 }

@@ -80,34 +80,49 @@ export function LeadDashboard({
     }
   }, [activeTab, currentSheetName, isConfigured]);
 
-  const renderCellContent = (cellValue: string) => {
+  const renderCellContent = (header: string, cellValue: string) => {
     if (!cellValue) return <span className="text-[#484f58] italic">—</span>;
 
-    // Check if cell contains comma-separated URLs or text
-    if (cellValue.includes('http')) {
-      const parts = cellValue.split(',').map((p) => p.trim()).filter(Boolean);
+    const lowerHeader = header.toLowerCase();
+
+    // 1. Truncate long text fields (About / Bio / Summary / Headline) in the table preview
+    if (lowerHeader.includes('about') || lowerHeader.includes('bio') || lowerHeader.includes('summary') || lowerHeader.includes('headline')) {
       return (
-        <div className="flex flex-wrap items-center gap-1.5 max-w-xs">
-          {parts.map((part, idx) => {
-            if (part.startsWith('http')) {
-              return (
-                <a
-                  key={idx}
-                  href={part}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 underline font-medium truncate max-w-[200px]"
-                  title={part}
-                >
-                  <span>{part.replace(/^https?:\/\/(www\.)?/, '')}</span>
-                  <ExternalLinkIcon size={12} className="shrink-0 opacity-75" />
-                </a>
-              );
-            }
-            return <span key={idx}>{part}</span>;
-          })}
-        </div>
+        <span className="truncate max-w-xs block text-[#8b949e]" title={cellValue}>
+          {cellValue}
+        </span>
       );
+    }
+
+    // 2. Format Website / Contact Link cell with 1+, 2+ count badges if multiple links exist
+    if (lowerHeader.includes('website') || cellValue.includes('http')) {
+      const parts = cellValue.split(',').map((p) => p.trim()).filter(Boolean);
+      const httpLinks = parts.filter((p) => p.startsWith('http'));
+
+      if (httpLinks.length > 0) {
+        const firstLink = httpLinks[0];
+        const extraCount = httpLinks.length - 1;
+
+        return (
+          <div className="flex items-center gap-1.5">
+            <a
+              href={firstLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 underline font-medium truncate max-w-[180px]"
+              title={firstLink}
+            >
+              <span>{firstLink.replace(/^https?:\/\/(www\.)?/, '')}</span>
+              <ExternalLinkIcon size={12} className="shrink-0 opacity-75" />
+            </a>
+            {extraCount > 0 && (
+              <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold shrink-0 font-mono" title={`${extraCount} more websites in preview modal`}>
+                +{extraCount}
+              </span>
+            )}
+          </div>
+        );
+      }
     }
 
     return cellValue;
@@ -256,9 +271,9 @@ export function LeadDashboard({
                     </button>
                   </td>
                   <td className="px-4 py-2.5 text-center text-[#8b949e] font-mono text-[11px]">{rIdx + 1}</td>
-                  {headers.map((_, cIdx) => (
+                  {headers.map((h, cIdx) => (
                     <td key={cIdx} className="px-4 py-2.5 max-w-xs truncate">
-                      {renderCellContent(row[cIdx])}
+                      {renderCellContent(h, row[cIdx])}
                     </td>
                   ))}
                 </tr>
