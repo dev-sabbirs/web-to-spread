@@ -69,20 +69,30 @@ export async function extractLinkedInProfile(): Promise<ExtractedProfile> {
     await new Promise((resolve) => setTimeout(resolve, 1200));
   }
 
-  const name = first('h1.text-heading-xlarge', 'h1.inline', '.pv-top-card--list li', '.pv-text-details__left-panel h1');
+  const name = first(
+    'h1.text-heading-xlarge',
+    'h1.inline',
+    'h2._687a5045',
+    'a[href*="/overlay/contact-info/"] h2',
+    '.pv-top-card--list li',
+    '.pv-text-details__left-panel h1'
+  );
   const headline = first(
     '.text-body-medium[data-generated-suggestion-target]',
     '.pv-top-card--list-bullet .text-body-medium',
     '.pv-text-details__left-panel .text-body-medium',
-    'div[data-test-id="headline"]'
+    'div[data-test-id="headline"]',
+    'p._8c535ff6',
+    'a[href*="/overlay/contact-info/"] ~ p'
   );
   const location = first(
     '.pb5 .text-body-small.inline',
     '.pv-top-card--list-bullet + div .text-body-small',
-    '.pv-text-details__left-panel .text-body-small'
+    '.pv-text-details__left-panel .text-body-small',
+    'p._3ab7a3ad'
   );
   const company = extractLinkedInCompany();
-  const connectionDegree = first('.dist-value', 'span.distance-badge');
+  const connectionDegree = first('.dist-value', 'span.distance-badge', 'p._a1e2d8b2');
 
   // Extract full "About" section text
   const about = extractLinkedInAbout();
