@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import webExtension, { readJsonFile } from "vite-plugin-web-extension";
+import path from "node:path";
 
 function generateManifest() {
   const manifest = readJsonFile("src/manifest.json");
@@ -17,6 +18,11 @@ function generateManifest() {
 // https://vitejs.dev/config/
 export default defineConfig({
   envPrefix: ["VITE_", "WEB_APP", "DEPLOYMENT_ID"],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
   plugins: [
     tailwindcss(),
     react(),

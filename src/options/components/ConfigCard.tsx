@@ -1,7 +1,11 @@
-import { CheckCircleIcon, AlertIcon, SpinnerIcon, ExternalLinkIcon } from '../icons';
+import { CheckCircleIcon, AlertIcon, SpinnerIcon } from '../icons';
 import { APPS_SCRIPT_URL_PREFIX } from '../../shared/constants';
 import type { SaveState, TestState } from '../../shared/types';
-import type { AppTheme } from '../../shared/storage';
+import { Card, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface ConfigCardProps {
   url: string;
@@ -9,7 +13,6 @@ interface ConfigCardProps {
   linkedinSheetName: string;
   geminiApiKey: string;
   geminiModel: string;
-  theme?: AppTheme;
   isValidUrl: boolean;
   isConfigured: boolean;
   saveState: SaveState;
@@ -21,15 +24,14 @@ interface ConfigCardProps {
   onLinkedinSheetNameChange: (v: string) => void;
   onGeminiApiKeyChange: (v: string) => void;
   onGeminiModelChange: (v: string) => void;
-  onThemeChange: (v: AppTheme) => void;
   onSave: () => void;
   onTest: () => void;
 }
 
 export function ConfigCard({
-  url, githubSheetName, linkedinSheetName, geminiApiKey, geminiModel, theme = 'dark', isValidUrl, isConfigured,
+  url, githubSheetName, linkedinSheetName, geminiApiKey, geminiModel, isValidUrl, isConfigured,
   saveState, saveMsg, testState, testMsg,
-  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onGeminiApiKeyChange, onGeminiModelChange, onThemeChange, onSave, onTest,
+  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onGeminiApiKeyChange, onGeminiModelChange, onSave, onTest,
 }: ConfigCardProps) {
   const isTesting = testState === 'testing';
   const isSaving  = saveState === 'saving';
@@ -37,19 +39,19 @@ export function ConfigCard({
   const canTest   = isValidUrl && !isTesting;
 
   return (
-    <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-xl p-6 flex flex-col gap-5 shadow-2xl">
+    <Card className="p-6 flex flex-col gap-5">
       {/* Card header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-[#f5f5f5]">Connection Settings</h3>
-          <p className="text-xs text-[#a3a3a3] mt-0.5">
+          <CardTitle className="text-sm font-semibold">Connection Settings</CardTitle>
+          <CardDescription className="mt-0.5">
             Link the extension to your Google Sheet via an Apps Script web app.
-          </p>
+          </CardDescription>
         </div>
         {isConfigured && (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-medium shrink-0">
+          <Badge variant="success" className="gap-1.5 px-2.5 py-1 text-xs">
             <CheckCircleIcon size={12} /> Configured
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -59,15 +61,15 @@ export function ConfigCard({
           Apps Script Web App URL <span className="text-red-400">*</span>
         </label>
         <div className="relative">
-          <input
+          <Input
             id="script-url"
             type="url"
-            className={`w-full px-3 py-2 bg-[#141414] border rounded-lg text-xs font-mono text-[#f5f5f5] placeholder-[#525252] outline-none transition-all ${
+            className={`font-mono ${
               url && !isValidUrl
                 ? 'border-red-500/80 focus:ring-2 focus:ring-red-500/20'
                 : isValidUrl
                 ? 'border-emerald-500/80 focus:ring-2 focus:ring-emerald-500/20 pr-9'
-                : 'border-[#262626] focus:border-[#404040]'
+                : ''
             }`}
             placeholder={`${APPS_SCRIPT_URL_PREFIX}AKfycb.../exec`}
             value={url}
@@ -128,46 +130,12 @@ export function ConfigCard({
       </div>
 
       {/* Theme Preference Section */}
-      <div className="pt-4 border-t border-[#1c1c1c] flex flex-col gap-3">
+      <div className="pt-4 border-t border-[var(--border)] flex flex-col gap-3">
         <div>
-          <h4 className="text-xs font-bold text-[#f5f5f5] uppercase tracking-wider">Appearance Theme</h4>
-          <p className="text-xs text-[#737373] mt-0.5">Switch workspace appearance theme across Dark, Light, or System preference.</p>
+          <h4 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">Appearance Theme</h4>
+          <p className="text-xs text-[var(--muted-foreground)] mt-0.5">Switch workspace appearance between Dark, Light, or follow System preference.</p>
         </div>
-        <div className="grid grid-cols-3 gap-3 max-w-md">
-          <button
-            type="button"
-            onClick={() => onThemeChange('dark')}
-            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              theme === 'dark'
-                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
-                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
-            }`}
-          >
-            <span>🌙</span> Dark
-          </button>
-          <button
-            type="button"
-            onClick={() => onThemeChange('light')}
-            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              theme === 'light'
-                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
-                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
-            }`}
-          >
-            <span>☀️</span> Light
-          </button>
-          <button
-            type="button"
-            onClick={() => onThemeChange('system')}
-            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              theme === 'system'
-                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
-                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
-            }`}
-          >
-            <span>💻</span> System
-          </button>
-        </div>
+        <ModeToggle />
       </div>
 
       {/* Gemini AI Settings Section */}
@@ -221,14 +189,8 @@ export function ConfigCard({
 
       {/* Actions */}
       <div className="flex items-center gap-3 pt-1">
-        <button
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-            testState === 'success'
-              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-              : testState === 'error'
-              ? 'bg-red-500/10 text-red-400 border-red-500/30'
-              : 'bg-[#141414] hover:bg-[#262626] text-[#d4d4d4] hover:text-white border-[#262626]'
-          } disabled:opacity-40 disabled:cursor-not-allowed`}
+        <Button
+          variant={testState === 'success' ? 'secondary' : testState === 'error' ? 'destructive' : 'outline'}
           onClick={onTest}
           disabled={!canTest}
           type="button"
@@ -240,17 +202,18 @@ export function ConfigCard({
           ) : (
             'Test Connection'
           )}
-        </button>
+        </Button>
 
-        <button
-          className="inline-flex items-center gap-2 px-5 py-2 bg-[#171717] hover:bg-[#262626] border border-[#262626] hover:border-[#404040] text-[#f5f5f5] font-semibold text-xs rounded-lg transition-all shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        <Button
+          variant="default"
           onClick={onSave}
           disabled={!canSave}
+          type="button"
         >
           {isSaving && <><SpinnerIcon size={14} /> Saving…</>}
           {!isSaving && saveState === 'saved' && <><CheckCircleIcon size={14} /> Saved!</>}
           {!isSaving && saveState !== 'saved' && 'Save Settings'}
-        </button>
+        </Button>
       </div>
 
       {/* Feedback messages */}
@@ -270,16 +233,6 @@ export function ConfigCard({
           <span>{saveMsg}</span>
         </div>
       )}
-
-      {/* External links */}
-      <div className="flex gap-4 pt-3 border-t border-[#21262d]">
-        <a href="https://script.google.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-[#8b949e] hover:text-indigo-400 transition-colors">
-          <ExternalLinkIcon size={12} /> Open Google Apps Script
-        </a>
-        <a href="https://docs.google.com/spreadsheets" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs text-[#8b949e] hover:text-indigo-400 transition-colors">
-          <ExternalLinkIcon size={12} /> Open Google Sheets
-        </a>
-      </div>
-    </div>
+    </Card>
   );
 }

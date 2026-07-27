@@ -66,7 +66,7 @@ export default function Options() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#050505] text-[#f5f5f5] font-sans antialiased">
+    <div className="flex min-h-screen font-sans antialiased" style={{ backgroundColor: 'var(--background)', color: 'var(--foreground)' }}>
       <Sidebar
         isConfigured={hook.isConfigured}
         activeTab={activeTab}
@@ -96,9 +96,9 @@ export default function Options() {
         {/* ── Dashboard Tab ── */}
         {activeTab === 'dashboard' && (
           <section id="dashboard" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">Dashboard Overview</h2>
-              <p className="text-xs text-[#8b949e] mt-1">High-level lead metrics, system connection status, and quick shortcuts.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Dashboard Overview</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>High-level lead metrics, system connection status, and quick shortcuts.</p>
             </div>
             <OverviewDashboard
               githubSheetName={hook.settings.githubSheetName}
@@ -124,9 +124,9 @@ export default function Options() {
         {/* ── Leads Tab ── */}
         {activeTab === 'leads' && (
           <section id="leads" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">Extracted Leads</h2>
-              <p className="text-xs text-[#8b949e] mt-1">Preview live extracted leads from your Google Sheet or flush existing records.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Extracted Leads</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>Preview live extracted leads from your Google Sheet or flush existing records.</p>
             </div>
             <LeadDashboard
               key={leadsPlatform}
@@ -145,9 +145,9 @@ export default function Options() {
         {/* ── Personal Profile AI Tab ── */}
         {activeTab === 'profile' && (
           <section id="profile" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">My Personal AI Profile</h2>
-              <p className="text-xs text-[#8b949e] mt-1">Configure your personal background, portfolio, and value offer so Gemini AI writes authentic outreach as you.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>My Personal AI Profile</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>Configure your personal background, portfolio, and value offer so Gemini AI writes authentic outreach as you.</p>
             </div>
             <UserProfileCard />
           </section>
@@ -156,9 +156,9 @@ export default function Options() {
         {/* ── Dedicated Usage & Token Analytics Tab ── */}
         {activeTab === 'usage' && (
           <section id="usage" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">Usage & Plan Quotas</h2>
-              <p className="text-xs text-[#8b949e] mt-1">Monitor real-time token consumption, request rate limits, and plan details.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Usage & Plan Quotas</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>Monitor real-time token consumption, request rate limits, and plan details.</p>
             </div>
             <UsagePage onNavigate={handleSelectTab} />
           </section>
@@ -167,9 +167,9 @@ export default function Options() {
         {/* ── Settings Tab ── */}
         {activeTab === 'settings' && (
           <section id="settings" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">Settings</h2>
-              <p className="text-xs text-[#8b949e] mt-1">Connect to Google Sheets via a deployed Apps Script web app.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Settings</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>Connect to Google Sheets via a deployed Apps Script web app.</p>
             </div>
             <ConfigCard
               url={hook.settings.appsScriptUrl}
@@ -177,7 +177,6 @@ export default function Options() {
               linkedinSheetName={hook.settings.linkedinSheetName}
               geminiApiKey={hook.settings.geminiApiKey}
               geminiModel={hook.settings.geminiModel}
-              theme={hook.settings.theme}
               isValidUrl={hook.isValidUrl}
               isConfigured={hook.isConfigured}
               saveState={hook.saveState}
@@ -189,7 +188,6 @@ export default function Options() {
               onLinkedinSheetNameChange={hook.updateLinkedinSheetName}
               onGeminiApiKeyChange={hook.updateGeminiApiKey}
               onGeminiModelChange={hook.updateGeminiModel}
-              onThemeChange={hook.updateTheme}
               onSave={hook.save}
               onTest={hook.testConnection}
             />
@@ -199,9 +197,9 @@ export default function Options() {
         {/* ── Setup Guide Tab ── */}
         {activeTab === 'guide' && (
           <section id="guide" className="animate-in fade-in duration-200">
-            <div className="mb-6 pb-4 border-b border-[#21262d]">
-              <h2 className="text-xl font-bold text-[#e6edf3]">Setup Guide</h2>
-              <p className="text-xs text-[#8b949e] mt-1">One-time setup — takes about 5 minutes.</p>
+            <div className="mb-6 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Setup Guide</h2>
+              <p className="text-xs mt-1" style={{ color: 'var(--muted-foreground)' }}>One-time setup — takes about 5 minutes.</p>
             </div>
             <HowItWorks />
           </section>
