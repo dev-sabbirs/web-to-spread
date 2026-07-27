@@ -27,33 +27,33 @@ export function DashboardHeader({
   setShowMailComposer,
 }: DashboardHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#21262d]">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#1c1c1c]">
       <div>
-        <h3 className="text-base font-bold text-[#e6edf3] flex items-center gap-2">
+        <h3 className="text-base font-bold text-[#f5f5f5] flex items-center gap-2">
           Leads Dashboard
-          <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-[#1c1c1c] text-[#d4d4d4] border border-[#262626] font-mono">
             {rowsCount} {rowsCount === 1 ? 'lead' : 'leads'}
           </span>
         </h3>
-        <p className="text-xs text-[#8b949e] mt-1">
-          Real-time preview of extracted leads from Google Sheets (<code className="text-indigo-300">{currentSheetName}</code>).
+        <p className="text-xs text-[#737373] mt-1">
+          Real-time preview of extracted leads from Google Sheets (<code className="text-[#d4d4d4] font-mono">{currentSheetName}</code>).
         </p>
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="inline-flex p-1 bg-[#0d1117] border border-[#30363d] rounded-lg">
+        <div className="inline-flex p-1 bg-[#141414] border border-[#262626] rounded-lg">
           <button
             onClick={() => { setActiveTab('github'); setSelectedRowIndex(null); setShowMailComposer(false); }}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              activeTab === 'github' ? 'bg-indigo-600 text-white shadow-sm' : 'text-[#8b949e] hover:text-[#e6edf3]'
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === 'github' ? 'bg-[#262626] text-white shadow-sm border border-[#404040]' : 'text-[#737373] hover:text-[#f5f5f5]'
             }`}
           >
             GitHub
           </button>
           <button
             onClick={() => { setActiveTab('linkedin'); setSelectedRowIndex(null); setShowMailComposer(false); }}
-            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-              activeTab === 'linkedin' ? 'bg-blue-600 text-white shadow-sm' : 'text-[#8b949e] hover:text-[#e6edf3]'
+            className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === 'linkedin' ? 'bg-[#262626] text-white shadow-sm border border-[#404040]' : 'text-[#737373] hover:text-[#f5f5f5]'
             }`}
           >
             LinkedIn

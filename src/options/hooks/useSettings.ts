@@ -12,6 +12,7 @@ export interface UseSettingsReturn {
   updateLinkedinSheetName: (v: string) => void;
   updateGeminiApiKey: (v: string) => void;
   updateGeminiModel: (v: string) => void;
+  updateTheme: (v: 'dark' | 'light' | 'system') => void;
   save: () => Promise<void>;
   saveState: SaveState;
   saveMsg: string;
@@ -30,6 +31,7 @@ export function useSettings(): UseSettingsReturn {
     linkedinSheetName: 'LinkedIn Leads',
     geminiApiKey: '',
     geminiModel: 'gemini-3.6-flash',
+    theme: 'dark',
   });
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMsg, setSaveMsg] = useState('');
@@ -56,6 +58,10 @@ export function useSettings(): UseSettingsReturn {
 
   const updateGeminiModel = useCallback((geminiModel: string) => {
     setSettings((p: StoredSettings) => ({ ...p, geminiModel }));
+  }, []);
+
+  const updateTheme = useCallback((theme: 'dark' | 'light' | 'system') => {
+    setSettings((p: StoredSettings) => ({ ...p, theme }));
   }, []);
 
   const save = useCallback(async () => {
@@ -102,6 +108,7 @@ export function useSettings(): UseSettingsReturn {
     updateLinkedinSheetName,
     updateGeminiApiKey,
     updateGeminiModel,
+    updateTheme,
     save,
     saveState,
     saveMsg,

@@ -120,14 +120,14 @@ export function LeadDashboard({
               href={firstLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 underline font-medium truncate max-w-[180px]"
+              className="inline-flex items-center gap-1 text-[#d4d4d4] hover:text-white underline font-medium truncate max-w-[180px]"
               title={firstLink}
             >
               <span>{firstLink.replace(/^https?:\/\/(www\.)?/, '')}</span>
               <ExternalLinkIcon size={12} className="shrink-0 opacity-75" />
             </a>
             {extraCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold shrink-0 font-mono">
+              <span className="px-1.5 py-0.5 rounded bg-[#262626] text-[#d4d4d4] border border-[#404040] text-[10px] font-bold shrink-0 font-mono">
                 +{extraCount}
               </span>
             )}
@@ -154,7 +154,7 @@ export function LeadDashboard({
   }
 
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 flex flex-col gap-5 shadow-lg shadow-black/20">
+    <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-xl p-6 flex flex-col gap-5 shadow-2xl">
       <DashboardHeader
         rowsCount={rows.length}
         currentSheetName={currentSheetName}

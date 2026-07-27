@@ -17,6 +17,7 @@ export const STORAGE_KEYS = {
   GEMINI_API_KEY: 'geminiApiKey',
   GEMINI_MODEL: 'geminiModel',
   AI_USAGE_STATS: 'aiUsageStats',
+  THEME: 'appTheme',
 } as const;
 
 export const ELEMENT_IDS = {

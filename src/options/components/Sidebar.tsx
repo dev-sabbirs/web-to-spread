@@ -47,30 +47,51 @@ export function Sidebar({
   }, []);
 
   return (
-    <aside className="hidden md:flex w-64 shrink-0 bg-[#161b22] border-r border-[#21262d] flex-col p-4 sticky top-0 h-screen justify-between relative">
+    <aside
+      className="hidden md:flex w-64 shrink-0 flex-col p-4 sticky top-0 h-screen justify-between relative"
+      style={{
+        backgroundColor: "var(--card)",
+        borderRight: "1px solid var(--border)",
+      }}
+    >
       {/* Top Section */}
       <div className="flex flex-col gap-5">
         {/* Brand Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#21262d]">
+        <div
+          className="flex items-center justify-between pb-3"
+          style={{ borderBottom: "1px solid var(--border)" }}
+        >
           <button
             onClick={() => onSelectTab("dashboard")}
             className="flex items-center gap-3 cursor-pointer group text-left"
           >
-            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+            <div
+              className="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center shadow-md transition-all"
+              style={{
+                backgroundColor: "var(--accent)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+              }}
+            >
               <SparklesIcon size={18} />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-[#e6edf3] group-hover:text-indigo-300 transition-colors leading-tight tracking-tight">
+              <h1
+                className="text-sm font-bold transition-colors leading-tight tracking-tight"
+                style={{ color: "var(--foreground)" }}
+              >
                 WebToSpread
               </h1>
-              <span className="text-[10px] text-[#8b949e] font-mono">v1.2.5 • Pro</span>
+              <span className="text-[10px] font-mono" style={{ color: "var(--muted-foreground)" }}>
+                v1.2.5 • Pro
+              </span>
             </div>
           </button>
 
           <button
             onClick={() => onSelectTab("settings")}
             className={`w-2.5 h-2.5 rounded-full shrink-0 cursor-pointer ${
-              isConfigured ? "bg-emerald-400 animate-pulse shadow-md shadow-emerald-500/50" : "bg-amber-400"
+              isConfigured ? "bg-emerald-500 shadow-sm shadow-emerald-500/50" : "bg-amber-500"
             }`}
             title={isConfigured ? "Sheet API Connected — Click for Settings" : "Configuration required — Click for Settings"}
           />
@@ -78,7 +99,10 @@ export function Sidebar({
 
         {/* Main Workspace Navigation */}
         <nav className="flex flex-col gap-1" aria-label="Main Navigation">
-          <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-[#8b949e] mb-1">
+          <span
+            className="px-2 text-[10px] font-bold uppercase tracking-wider mb-1"
+            style={{ color: "var(--muted-foreground)" }}
+          >
             Workspace
           </span>
           {NAV_ITEMS.map(({ id, label, Icon }) => {
@@ -87,11 +111,32 @@ export function Sidebar({
               <button
                 key={id}
                 onClick={() => onSelectTab(id)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all w-full text-left cursor-pointer ${
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all w-full text-left cursor-pointer"
+                style={
                   isActive
-                    ? "bg-gradient-to-r from-indigo-600/20 to-purple-600/20 text-indigo-300 border border-indigo-500/30 shadow-sm"
-                    : "text-[#8b949e] hover:bg-[#21262d] hover:text-[#e6edf3]"
-                }`}
+                    ? {
+                        backgroundColor: "var(--accent)",
+                        color: "var(--foreground)",
+                        border: "1px solid var(--border)",
+                        boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+                      }
+                    : {
+                        color: "var(--muted-foreground)",
+                        border: "1px solid transparent",
+                      }
+                }
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = "var(--accent)";
+                    (e.currentTarget as HTMLElement).style.color = "var(--foreground)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = "";
+                    (e.currentTarget as HTMLElement).style.color = "var(--muted-foreground)";
+                  }
+                }}
               >
                 <Icon size={18} />
                 <span>{label}</span>
@@ -101,109 +146,144 @@ export function Sidebar({
         </nav>
       </div>
 
-      {/* ChatGPT / Gemini Style Footer User Account Menu */}
-      <div className="relative pt-3 border-t border-[#21262d]" ref={menuRef}>
-        {/* Upward Popover Menu (ChatGPT style) */}
+      {/* Footer User Account Menu */}
+      <div
+        className="relative pt-3"
+        style={{ borderTop: "1px solid var(--border)" }}
+        ref={menuRef}
+      >
+        {/* Upward Popover Menu */}
         {isMenuOpen && (
-          <div className="absolute bottom-full left-0 mb-2 w-[240px] bg-[#171717] border border-[#262626] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2 duration-150 text-xs">
-            {/* User Email & Account Info */}
-            <div className="px-3 py-2 border-b border-[#262626] mb-1">
-              <div className="font-semibold text-[#f5f5f5] truncate">
+          <div
+            className="absolute bottom-full left-0 mb-2 w-[240px] rounded-2xl shadow-2xl p-1.5 flex flex-col gap-0.5 z-50 animate-in slide-in-from-bottom-2 duration-150 text-xs"
+            style={{
+              backgroundColor: "var(--muted)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {/* User Info */}
+            <div
+              className="px-3 py-2 mb-1"
+              style={{ borderBottom: "1px solid var(--border)" }}
+            >
+              <div className="font-semibold truncate" style={{ color: "var(--foreground)" }}>
                 {profile?.name || "Sabbir Hossain Shuvo"}
               </div>
-              <div className="text-[11px] text-[#a3a3a3] truncate mt-0.5">
+              <div className="text-[11px] truncate mt-0.5" style={{ color: "var(--muted-foreground)" }}>
                 {profile?.email || "sabbir@example.com"}
               </div>
             </div>
 
-            {/* Upgrade Plan Button -> Opens Dedicated Usage Page */}
+            {/* Upgrade Plan */}
             <button
               onClick={() => {
                 onSelectTab("usage");
                 setIsMenuOpen(false);
               }}
-              className="flex items-center justify-between px-3 py-2 hover:bg-[#262626] rounded-xl transition-colors w-full text-left cursor-pointer group"
+              className="flex items-center justify-between px-3 py-2 rounded-xl transition-colors w-full text-left cursor-pointer group"
+              style={{ color: "var(--foreground)" }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = "var(--accent)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = "";
+              }}
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-[10px]">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px]"
+                  style={{ backgroundColor: "var(--accent)", color: "var(--foreground)" }}
+                >
                   ✦
                 </div>
                 <div>
-                  <div className="font-medium text-[#f5f5f5] text-xs">Upgrade Plan</div>
-                  <div className="text-[10px] text-[#a3a3a3]">154.6k / 1M tokens used</div>
+                  <div className="font-medium text-xs" style={{ color: "var(--foreground)" }}>Upgrade Plan</div>
+                  <div className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>154.6k / 1M tokens used</div>
                 </div>
               </div>
-              <span className="text-[10px] bg-white/10 text-white font-semibold px-2 py-0.5 rounded-full group-hover:bg-purple-600 transition-colors">
+              <span
+                className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                style={{
+                  backgroundColor: "var(--accent)",
+                  color: "var(--foreground)",
+                  border: "1px solid var(--border)",
+                }}
+              >
                 Pro
               </span>
             </button>
 
-            <div className="my-1 border-t border-[#262626]" />
+            <div className="my-1" style={{ borderTop: "1px solid var(--border)" }} />
 
-            {/* ChatGPT Style Settings & Profile Links */}
-            <button
-              onClick={() => {
-                onSelectTab("profile");
-                setIsMenuOpen(false);
-              }}
-              className="flex items-center gap-2.5 px-3 py-2 text-[#d4d4d4] hover:bg-[#262626] hover:text-white rounded-xl transition-colors w-full text-left cursor-pointer font-medium"
-            >
-              <UserIcon size={16} />
-              <span>My Personal Profile</span>
-            </button>
-
-            <button
-              onClick={() => {
-                onSelectTab("settings");
-                setIsMenuOpen(false);
-              }}
-              className="flex items-center gap-2.5 px-3 py-2 text-[#d4d4d4] hover:bg-[#262626] hover:text-white rounded-xl transition-colors w-full text-left cursor-pointer font-medium"
-            >
-              <SettingsIcon size={16} />
-              <span>Settings & API Keys</span>
-            </button>
-
-            <button
-              onClick={() => {
-                onSelectTab("guide");
-                setIsMenuOpen(false);
-              }}
-              className="flex items-center gap-2.5 px-3 py-2 text-[#a3a3a3] hover:bg-[#262626] hover:text-white rounded-xl transition-colors w-full text-left cursor-pointer font-medium"
-            >
-              <BookIcon size={16} />
-              <span>Setup Guide</span>
-            </button>
+            {[
+              { label: "My Personal Profile", tab: "profile", Icon: UserIcon },
+              { label: "Settings & API Keys", tab: "settings", Icon: SettingsIcon },
+              { label: "Setup Guide", tab: "guide", Icon: BookIcon },
+            ].map(({ label, tab, Icon }) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  onSelectTab(tab);
+                  setIsMenuOpen(false);
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors w-full text-left cursor-pointer font-medium"
+                style={{ color: "var(--foreground)" }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = "";
+                }}
+              >
+                <Icon size={16} />
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
         )}
 
-          {/* User Account Button (Exact ChatGPT Sidebar Pill Style) */}
-          <button
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-            className={`flex items-center justify-between w-full p-2 rounded-xl transition-all text-left cursor-pointer ${
-              isMenuOpen
-                ? "bg-[#262626]"
-                : "hover:bg-[#21262d]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5 overflow-hidden">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
-                {profile?.name ? profile.name.charAt(0) : "S"}
+        {/* User Account Pill */}
+        <button
+          onClick={() => setIsMenuOpen((prev) => !prev)}
+          className="flex items-center justify-between w-full p-2 rounded-xl transition-all text-left cursor-pointer"
+          style={
+            isMenuOpen
+              ? { backgroundColor: "var(--accent)" }
+              : {}
+          }
+          onMouseEnter={(e) => {
+            if (!isMenuOpen) (e.currentTarget as HTMLElement).style.backgroundColor = "var(--accent)";
+          }}
+          onMouseLeave={(e) => {
+            if (!isMenuOpen) (e.currentTarget as HTMLElement).style.backgroundColor = "";
+          }}
+        >
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm"
+              style={{
+                backgroundColor: "var(--accent)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+              }}
+            >
+              {profile?.name ? profile.name.charAt(0) : "S"}
+            </div>
+            <div className="overflow-hidden">
+              <div className="text-xs font-semibold truncate leading-snug" style={{ color: "var(--foreground)" }}>
+                {profile?.name || "Sabbir Hossain"}
               </div>
-              <div className="overflow-hidden">
-                <div className="text-xs font-semibold text-[#f5f5f5] truncate leading-snug">
-                  {profile?.name || "Sabbir Hossain"}
-                </div>
-                <div className="text-[11px] text-[#a3a3a3] truncate leading-tight">
-                  {profile?.email || "Pro Account"}
-                </div>
+              <div className="text-[11px] truncate leading-tight" style={{ color: "var(--muted-foreground)" }}>
+                {profile?.email || "Pro Account"}
               </div>
             </div>
+          </div>
 
-            <span className="text-[#a3a3a3] text-xs font-bold px-1">
-              •••
-            </span>
-          </button>
-        </div>
-      </aside>
-    );
+          <span className="text-xs font-bold px-1" style={{ color: "var(--muted-foreground)" }}>
+            •••
+          </span>
+        </button>
+      </div>
+    </aside>
+  );
 }

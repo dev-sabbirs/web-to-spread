@@ -70,50 +70,58 @@ export function AiSidebarWidget({
   const currentPresets = MODE_PRESETS[mode];
 
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col gap-4 text-xs">
-      <div className="flex items-center justify-between border-b border-[#21262d] pb-3">
-        <h3 className="font-bold text-[#e6edf3] uppercase tracking-wider flex items-center gap-1.5 text-xs">
-          <SparklesIcon size={14} className="text-purple-400" />
-          AI Agent Assistant
-        </h3>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-mono">
-          Gemini
+    <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-5 flex flex-col gap-4 shadow-2xl">
+      <div className="flex items-center justify-between border-b border-[#1c1c1c] pb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-[#262626] border border-[#404040] flex items-center justify-center text-[#f5f5f5]">
+            <SparklesIcon size={15} />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-[#f5f5f5]">Gemini AI Assistant</h4>
+            <p className="text-[10px] text-[#737373]">Live SSE Stream Generator</p>
+          </div>
+        </div>
+        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1c1c1c] text-[#d4d4d4] border border-[#262626]">
+          AI
         </span>
       </div>
 
-      {/* Mode Selector Tabs */}
-      <div className="grid grid-cols-2 gap-1 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg">
-        <button
-          onClick={() => handleModeChange('client')}
-          className={`py-1.5 text-[11px] font-bold rounded-md transition-colors ${
-            mode === 'client'
-              ? 'bg-indigo-600 text-white shadow-sm'
-              : 'text-[#8b949e] hover:text-[#e6edf3]'
-          }`}
-        >
-          💼 Client Acquisition
-        </button>
-        <button
-          onClick={() => handleModeChange('job')}
-          className={`py-1.5 text-[11px] font-bold rounded-md transition-colors ${
-            mode === 'job'
-              ? 'bg-purple-600 text-white shadow-sm'
-              : 'text-[#8b949e] hover:text-[#e6edf3]'
-          }`}
-        >
-          🚀 Job Placement
-        </button>
-      </div>
-
       {error && (
-        <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-[11px]">
+        <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-[11px] font-medium">
           {error}
         </div>
       )}
 
+      {/* Mode Switcher */}
+      <div>
+        <label className="block text-[10px] font-bold text-[#737373] uppercase mb-1">Outreach Mode</label>
+        <div className="grid grid-cols-2 gap-1 p-1 bg-[#141414] border border-[#262626] rounded-xl">
+          <button
+            onClick={() => handleModeChange('client')}
+            className={`py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              mode === 'client'
+                ? 'bg-[#262626] text-white shadow-sm border border-[#404040]'
+                : 'text-[#737373] hover:text-[#f5f5f5]'
+            }`}
+          >
+            Client Acquisition
+          </button>
+          <button
+            onClick={() => handleModeChange('job')}
+            className={`py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              mode === 'job'
+                ? 'bg-[#262626] text-white shadow-sm border border-[#404040]'
+                : 'text-[#737373] hover:text-[#f5f5f5]'
+            }`}
+          >
+            Job Pitch
+          </button>
+        </div>
+      </div>
+
       {/* Quick Presets */}
       <div>
-        <label className="block text-[10px] font-semibold text-[#8b949e] uppercase mb-1">
+        <label className="block text-[10px] font-semibold text-[#737373] uppercase mb-1">
           {mode === 'client' ? 'Client Pitch Presets' : 'Job Outreach Presets'}
         </label>
         <div className="flex flex-wrap gap-1.5">
@@ -121,12 +129,10 @@ export function AiSidebarWidget({
             <button
               key={i}
               onClick={() => setPrompt(p.prompt)}
-              className={`px-2 py-1 rounded border text-[11px] font-medium transition-all ${
+              className={`px-2 py-1 rounded border text-[11px] font-medium transition-all cursor-pointer ${
                 prompt === p.prompt
-                  ? mode === 'client'
-                    ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
-                    : 'bg-purple-600/20 text-purple-300 border-purple-500/50'
-                  : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
+                  ? 'bg-[#262626] text-white border-[#404040]'
+                  : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
               }`}
             >
               {p.label}
@@ -137,16 +143,16 @@ export function AiSidebarWidget({
 
       {/* Tone Pills */}
       <div>
-        <label className="block text-[10px] font-semibold text-[#8b949e] uppercase mb-1">Tone</label>
+        <label className="block text-[10px] font-semibold text-[#737373] uppercase mb-1">Tone</label>
         <div className="grid grid-cols-2 gap-1.5">
           {TONE_OPTIONS.map((t, i) => (
             <button
               key={i}
               onClick={() => setTone(t)}
-              className={`px-2 py-1 rounded border text-[11px] text-center font-medium transition-all ${
+              className={`px-2 py-1 rounded border text-[11px] text-center font-medium transition-all cursor-pointer ${
                 tone === t
-                  ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
-                  : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
+                  ? 'bg-[#262626] text-white border-[#404040]'
+                  : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
               }`}
             >
               {t}
@@ -157,13 +163,13 @@ export function AiSidebarWidget({
 
       {/* Goal Instruction */}
       <div>
-        <label className="block text-[10px] font-semibold text-[#8b949e] uppercase mb-1">Instruction / Goal</label>
+        <label className="block text-[10px] font-semibold text-[#737373] uppercase mb-1">Instruction / Goal</label>
         <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={3}
           placeholder="What should AI write about?"
-          className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-2.5 py-1.5 text-xs text-[#e6edf3] focus:outline-none focus:border-purple-500 resize-none"
+          className="w-full bg-[#141414] border border-[#262626] rounded-lg px-2.5 py-1.5 text-xs text-[#f5f5f5] focus:outline-none focus:border-[#404040] resize-none"
         />
       </div>
 
@@ -171,11 +177,7 @@ export function AiSidebarWidget({
       <button
         onClick={handleGenerateStream}
         disabled={isStreaming || !prompt.trim()}
-        className={`w-full py-2.5 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 text-xs disabled:opacity-50 ${
-          mode === 'client'
-            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500'
-            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
-        }`}
+        className="w-full py-2.5 bg-[#171717] hover:bg-[#262626] border border-[#262626] hover:border-[#404040] text-[#f5f5f5] font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 text-xs cursor-pointer disabled:opacity-50"
       >
         {isStreaming ? (
           <>
@@ -183,7 +185,7 @@ export function AiSidebarWidget({
           </>
         ) : (
           <>
-            <SparklesIcon size={14} /> {mode === 'client' ? 'Write Client Pitch Live' : 'Write Job Outreach Live'}
+            <SparklesIcon size={14} /> Stream Email Draft
           </>
         )}
       </button>

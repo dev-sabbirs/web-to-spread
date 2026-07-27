@@ -25,21 +25,17 @@ export function LeadDetailModal({
   children,
 }: LeadDetailModalProps) {
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#161b22] border border-[#30363d] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#21262d] bg-[#0d1117]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1c1c1c] bg-[#141414]">
           <div className="flex items-center gap-2.5">
-            <div
-              className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs ${
-                activeTab === 'linkedin' ? 'bg-blue-600' : 'bg-indigo-600'
-              }`}
-            >
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs bg-[#262626] border border-[#404040]">
               {activeTab === 'linkedin' ? 'li' : 'gh'}
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#e6edf3]">Lead Details Preview</h3>
-              <p className="text-[11px] text-[#8b949e]">
+              <h3 className="text-sm font-bold text-[#f5f5f5]">Lead Details Preview</h3>
+              <p className="text-[11px] text-[#737373]">
                 Record #{selectedRowIndex + 1} from {currentSheetName}
               </p>
             </div>
@@ -47,17 +43,17 @@ export function LeadDetailModal({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMailComposer(!showMailComposer)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
                 showMailComposer
-                  ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/40'
-                  : 'bg-indigo-600 hover:bg-indigo-500 text-white border-transparent'
+                  ? 'bg-[#262626] text-[#f5f5f5] border-[#404040]'
+                  : 'bg-[#171717] hover:bg-[#262626] text-[#f5f5f5] border-[#262626]'
               }`}
             >
               {showMailComposer ? '← View Details' : '✉ Send Mail'}
             </button>
             <button
               onClick={onClose}
-              className="w-7 h-7 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-[#8b949e] hover:text-[#e6edf3] flex items-center justify-center text-sm font-bold transition-colors"
+              className="w-7 h-7 rounded-lg bg-[#1c1c1c] hover:bg-[#262626] text-[#737373] hover:text-[#f5f5f5] flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
             >
               ✕
             </button>

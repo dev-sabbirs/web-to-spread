@@ -54,23 +54,21 @@ export function UsagePage({ onNavigate }: UsagePageProps) {
   return (
     <div className="max-w-5xl flex flex-col gap-6 animate-in fade-in duration-200 pb-12">
       {/* Page Banner / Plan Header */}
-      <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-600/10 via-purple-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-        
+      <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-6 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="flex items-center gap-4 relative">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-indigo-500/20">
+          <div className="w-14 h-14 rounded-2xl bg-[#1c1c1c] border border-[#262626] flex items-center justify-center text-[#f5f5f5] font-bold text-xl shadow-md">
             {profile?.name ? profile.name.charAt(0) : "S"}
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-[#e6edf3]">
+              <h2 className="text-xl font-bold text-[#f5f5f5]">
                 {profile?.name || "Sabbir Hossain Shuvo"}
               </h2>
-              <span className="px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs font-bold shadow-md shadow-indigo-500/20">
+              <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-md">
                 Pro Plan Active
               </span>
             </div>
-            <p className="text-xs text-[#8b949e] mt-1">
+            <p className="text-xs text-[#a3a3a3] mt-1">
               {profile?.title || "Backend Software Engineer • DevOps Engineer"}
             </p>
           </div>
@@ -79,13 +77,13 @@ export function UsagePage({ onNavigate }: UsagePageProps) {
         <div className="flex items-center gap-3 relative">
           <button
             onClick={() => onNavigate("settings")}
-            className="px-4 py-2 bg-[#21262d] hover:bg-[#30363d] text-[#e6edf3] text-xs font-semibold rounded-xl border border-[#30363d] transition-colors cursor-pointer flex items-center gap-2"
+            className="px-4 py-2 bg-[#171717] hover:bg-[#262626] text-[#f5f5f5] text-xs font-semibold rounded-xl border border-[#262626] transition-colors cursor-pointer flex items-center gap-2"
           >
             <SettingsIcon size={14} /> Custom API Keys
           </button>
           <button
             onClick={() => onNavigate("profile")}
-            className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition-all cursor-pointer flex items-center gap-2"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-950/40 transition-all cursor-pointer flex items-center gap-2"
           >
             <UserIcon size={14} /> AI Persona Settings
           </button>
@@ -94,22 +92,22 @@ export function UsagePage({ onNavigate }: UsagePageProps) {
 
       {/* Plan Quotas & Realtime Token Usage Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
+        <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#8b949e]">Monthly Token Quota</span>
-            <span className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">✦</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#737373]">Monthly Token Quota</span>
+            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">✦</span>
           </div>
           <div>
-            <div className="text-2xl font-black text-indigo-400 font-mono">
+            <div className="text-2xl font-black text-emerald-400 font-mono">
               {totalTokens.toLocaleString()}
             </div>
-            <div className="text-xs text-[#8b949e] mt-0.5">out of 1,000,000 monthly tokens</div>
+            <div className="text-xs text-[#a3a3a3] mt-0.5">out of 1,000,000 monthly tokens</div>
           </div>
           {/* Dynamic Progress bar */}
-          <div className="w-full bg-[#0d1117] h-2 rounded-full overflow-hidden border border-[#30363d]">
+          <div className="w-full bg-[#141414] h-2 rounded-full overflow-hidden border border-[#262626]">
             <div
               style={{ width: `${percentageUsed}%` }}
-              className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-300"
             />
           </div>
           <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
@@ -117,71 +115,71 @@ export function UsagePage({ onNavigate }: UsagePageProps) {
           </span>
         </div>
 
-        <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
+        <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#8b949e]">Generated Emails</span>
-            <span className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400">✉</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#737373]">Generated Emails</span>
+            <span className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400">✉</span>
           </div>
           <div>
-            <div className="text-2xl font-black text-purple-400 font-mono">{totalEmails}</div>
-            <div className="text-xs text-[#8b949e] mt-0.5">outreach compositions created</div>
+            <div className="text-2xl font-black text-teal-400 font-mono">{totalEmails}</div>
+            <div className="text-xs text-[#a3a3a3] mt-0.5">outreach compositions created</div>
           </div>
-          <div className="text-[11px] text-[#8b949e] border-t border-[#21262d] pt-2">
-            Average cost: <span className="font-mono text-[#e6edf3]">{avgTokensPerEmail} tokens/email</span>
+          <div className="text-[11px] text-[#a3a3a3] border-t border-[#1c1c1c] pt-2">
+            Average cost: <span className="font-mono text-[#f5f5f5]">{avgTokensPerEmail} tokens/email</span>
           </div>
         </div>
 
-        <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
+        <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#8b949e]">Active Model Tier</span>
-            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">⚡</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#737373]">Active Model Tier</span>
+            <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400">⚡</span>
           </div>
           <div>
-            <div className="text-lg font-bold text-[#e6edf3]">
+            <div className="text-lg font-bold text-[#f5f5f5]">
               {settings?.geminiModel || "gemini-3.6-flash"}
             </div>
-            <div className="text-xs text-emerald-400 font-mono mt-0.5">High Speed SSE Engine</div>
+            <div className="text-xs text-cyan-400 font-mono mt-0.5">High Speed SSE Engine</div>
           </div>
-          <div className="text-[11px] text-[#8b949e] border-t border-[#21262d] pt-2">
+          <div className="text-[11px] text-[#a3a3a3] border-t border-[#1c1c1c] pt-2">
             Rate limit: <span className="font-mono text-emerald-400">15 / 15 RPM</span>
           </div>
         </div>
 
-        <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
+        <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-5 flex flex-col justify-between gap-3 shadow-lg">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#8b949e]">API Pricing Tier</span>
-            <span className="p-1.5 rounded-lg bg-pink-500/10 text-pink-400">💎</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#737373]">API Pricing Tier</span>
+            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">💎</span>
           </div>
           <div>
-            <div className="text-2xl font-black text-pink-400 font-mono">$0.00 / mo</div>
-            <div className="text-xs text-[#8b949e] mt-0.5">Free Developer Plan Active</div>
+            <div className="text-2xl font-black text-emerald-400 font-mono">$0.00 / mo</div>
+            <div className="text-xs text-[#a3a3a3] mt-0.5">Free Developer Plan Active</div>
           </div>
-          <div className="text-[11px] text-[#8b949e] border-t border-[#21262d] pt-2">
-            Key: <span className="font-mono text-indigo-300">{settings?.geminiApiKey ? "Custom Key" : "Built-in System Key"}</span>
+          <div className="text-[11px] text-[#a3a3a3] border-t border-[#1c1c1c] pt-2">
+            Key: <span className="font-mono text-teal-300">{settings?.geminiApiKey ? "Custom Key" : "Built-in System Key"}</span>
           </div>
         </div>
       </div>
 
       {/* Analytics Chart & Detailed History */}
-      <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-6 flex flex-col gap-6 shadow-xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#21262d] pb-4">
+      <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-6 flex flex-col gap-6 shadow-2xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#1c1c1c] pb-4">
           <div>
-            <h3 className="text-base font-bold text-[#e6edf3] flex items-center gap-2">
-              <SparklesIcon size={18} className="text-indigo-400" />
+            <h3 className="text-base font-bold text-[#f5f5f5] flex items-center gap-2">
+              <SparklesIcon size={18} className="text-emerald-400" />
               Token Usage Analytics
             </h3>
-            <p className="text-xs text-[#8b949e] mt-0.5">
+            <p className="text-xs text-[#a3a3a3] mt-0.5">
               Historical breakdown of prompt processing & response generation tokens.
             </p>
           </div>
 
-          <div className="flex items-center gap-1 bg-[#0d1117] p-1 rounded-xl border border-[#30363d] text-xs font-bold">
+          <div className="flex items-center gap-1 bg-[#141414] p-1 rounded-xl border border-[#262626] text-xs font-bold">
             {(["7d", "30d", "90d"] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTimeframe(t)}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                  timeframe === t ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20" : "text-[#8b949e] hover:text-[#e6edf3]"
+                  timeframe === t ? "bg-emerald-600 text-white shadow-md" : "text-[#737373] hover:text-[#f5f5f5]"
                 }`}
               >
                 {t.toUpperCase()}
@@ -191,19 +189,19 @@ export function UsagePage({ onNavigate }: UsagePageProps) {
         </div>
 
         {/* Dynamic Bar Chart Visualizer */}
-        <div className="flex items-end justify-between gap-4 h-48 pt-6 px-4 bg-[#0d1117] rounded-xl border border-[#30363d]">
+        <div className="flex items-end justify-between gap-4 h-48 pt-6 px-4 bg-[#141414] rounded-xl border border-[#262626]">
           {last7Days.map((bar) => {
             const heightPercent = bar.tokens > 0 ? Math.max(15, Math.round((bar.tokens / maxDayTokens) * 100)) : 8;
             return (
               <div key={bar.day} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                <div className="text-xs font-mono text-indigo-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="text-xs font-mono text-[#d4d4d4] opacity-0 group-hover:opacity-100 transition-opacity">
                   {(bar.tokens / 1000).toFixed(1)}k
                 </div>
                 <div
                   style={{ height: `${heightPercent}%` }}
-                  className="w-full max-w-[48px] bg-gradient-to-t from-indigo-600 via-purple-600 to-pink-500 rounded-t-lg group-hover:brightness-125 transition-all shadow-lg shadow-indigo-500/20"
+                  className="w-full max-w-[48px] bg-gradient-to-t from-[#262626] via-[#404040] to-[#737373] rounded-t-lg group-hover:brightness-150 transition-all shadow-md"
                 />
-                <span className="text-xs font-mono text-[#8b949e]">{bar.day}</span>
+                <span className="text-xs font-mono text-[#737373]">{bar.day}</span>
               </div>
             );
           })}

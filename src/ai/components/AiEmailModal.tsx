@@ -60,21 +60,21 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-[#161b22] border border-[#30363d] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#21262d] bg-[#0d1117]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1c1c1c] bg-[#141414]">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+            <div className="w-8 h-8 rounded-lg bg-[#262626] border border-[#404040] flex items-center justify-center text-[#f5f5f5] font-bold text-xs">
               <SparklesIcon size={16} />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-[#e6edf3]">Gemini AI Email Generator</h3>
-              <p className="text-[11px] text-[#8b949e]">Generate high-converting outreach powered by Google Gemini</p>
+              <h3 className="text-sm font-bold text-[#f5f5f5]">Gemini AI Email Generator</h3>
+              <p className="text-[11px] text-[#737373]">Generate high-converting outreach powered by Google Gemini</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-[#8b949e] hover:text-[#e6edf3] flex items-center justify-center text-sm font-bold"
+            className="w-7 h-7 rounded-lg bg-[#1c1c1c] hover:bg-[#262626] text-[#737373] hover:text-[#f5f5f5] flex items-center justify-center text-sm font-bold cursor-pointer"
           >
             ✕
           </button>
@@ -89,16 +89,16 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
           )}
 
           <div>
-            <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Quick Presets</label>
+            <label className="block text-[11px] font-semibold text-[#737373] uppercase mb-1.5">Quick Presets</label>
             <div className="flex flex-wrap gap-2">
               {MODE_PRESETS.client.map((p: { label: string; prompt: string }, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setPrompt(p.prompt)}
-                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
                     prompt === p.prompt
-                      ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
-                      : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
+                      ? 'bg-[#262626] text-white border-[#404040]'
+                      : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
                   }`}
                 >
                   {p.label}
