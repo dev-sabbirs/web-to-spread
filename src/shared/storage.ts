@@ -22,13 +22,15 @@ export async function getSettings(): Promise<StoredSettings> {
     STORAGE_KEYS.GITHUB_SHEET_NAME,
     STORAGE_KEYS.LINKEDIN_SHEET_NAME,
   ]);
+  const defaultUrl = import.meta.env.VITE_APPS_SCRIPT_URL || '';
   return {
-    appsScriptUrl: (data[STORAGE_KEYS.APPS_SCRIPT_URL] as string) || '',
+    appsScriptUrl: (data[STORAGE_KEYS.APPS_SCRIPT_URL] as string) || defaultUrl,
     sheetName: (data[STORAGE_KEYS.SHEET_NAME] as string) || DEFAULT_SHEET_NAME,
     githubSheetName: (data[STORAGE_KEYS.GITHUB_SHEET_NAME] as string) || DEFAULT_GITHUB_SHEET_NAME,
     linkedinSheetName: (data[STORAGE_KEYS.LINKEDIN_SHEET_NAME] as string) || DEFAULT_LINKEDIN_SHEET_NAME,
   };
 }
+
 
 /** Persist partial settings to sync storage. Rejects on chrome runtime error. */
 export function saveSettings(settings: Partial<StoredSettings>): Promise<void> {

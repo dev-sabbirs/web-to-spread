@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+/* Clean subtle link styling with colored bottom border underline */
+.editor-content a {
+  color: #10b981 !important; /* emerald-500 */
+  border-bottom: 2px solid #10b981 !important; /* clean green bottom border */
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  padding-bottom: 1px !important;
+  transition: color 0.15s ease, border-color 0.15s ease !important;
+}
+
+.editor-content a:hover {
+  color: #34d399 !important; /* emerald-400 */
+  border-bottom-color: #34d399 !important;
+}
+
+.preview-content a {
+  color: #059669 !important; /* emerald-600 */
+  border-bottom: 2px solid #059669 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  padding-bottom: 1px !important;
+}

@@ -197,7 +197,16 @@ export function SendMailPage({
 
           <div>
             <label className="block text-xs font-semibold text-[#8b949e] mb-1">Message Body (Rich Text)</label>
-            <RichTextEditor value={htmlBody} onChange={setHtmlBody} />
+            <RichTextEditor
+              value={htmlBody}
+              onChange={setHtmlBody}
+              onApplySubject={setSubject}
+              leadContext={
+                selectedEmails.length === 1
+                  ? leads.find((l) => l.email === selectedEmails[0])
+                  : undefined
+              }
+            />
           </div>
 
           <div className="flex justify-end pt-2">

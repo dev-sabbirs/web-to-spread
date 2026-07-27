@@ -65,11 +65,24 @@ export interface FlushSheetMessage {
   sheetName: string;
 }
 
+export interface GenerateAiEmailMessage {
+  type: 'GENERATE_AI_EMAIL';
+  prompt: string;
+  tone?: string;
+  leadContext?: {
+    name?: string;
+    headline?: string;
+    bio?: string;
+    email?: string;
+  };
+}
+
 export type ExtensionMessage =
   | SendToSheetMessage
   | TestConnectionMessage
   | FetchLeadsMessage
-  | FlushSheetMessage;
+  | FlushSheetMessage
+  | GenerateAiEmailMessage;
 
 export interface MessageResponse {
   success: boolean;

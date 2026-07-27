@@ -1,0 +1,190 @@
+import React, { useState } from 'react';
+import { MESSAGE_TYPES } from '../../shared/constants';
+import type { MessageResponse } from '../../shared/types';
+import { SparklesIcon, SpinnerIcon } from '../icons';
+
+interface AiEmailModalProps {
+  onClose: () => void;
+  onApply: (generatedSubject: string, generatedHtmlBody: string) => void;
+  leadContext?: {
+    name?: string;
+    headline?: string;
+    bio?: string;
+    email?: string;
+  };
+}
+
+const PRESET_PROMPTS = [
+  { label: 'Cold Outreach', prompt: 'Write a compelling cold email introducing our web development and automation services.' },
+  { label: 'Follow Up', prompt: 'Write a polite follow-up email regarding our previous message and check their availability.' },
+  { label: 'Feature Pitch', prompt: 'Write a personalized pitch highlighting how our solution saves hours of lead extraction.' },
+];
+
+const TONE_OPTIONS = ['Professional & Friendly', 'Persuasive & High Energy', 'Short & Direct', 'Casual & Conversational'];
+
+export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProps) {
+  const [prompt, setPrompt] = useState(PRESET_PROMPTS[0].prompt);
+  const [tone, setTone] = useState(TONE_OPTIONS[0]);
+  const [generating, setGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [generatedSubject, setGeneratedSubject] = useState('');
+  const [generatedHtmlBody, setGeneratedHtmlBody] = useState('');
+
+  const handleGenerate = async () => {
+    if (!prompt.trim()) return;
+    setGenerating(true);
+    setError(null);
+    try {
+      const res: MessageResponse = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.GENERATE_AI_EMAIL,
+        prompt,
+        tone,
+        leadContext,
+      });
+
+      if (res.success && res.data?.rows?.[0]) {
+        const [subj, body] = res.data.rows[0];
+        setGeneratedSubject(subj);
+        setGeneratedHtmlBody(body);
+      } else {
+        setError(res.error || 'Failed to generate email content.');
+      }
+    } catch {
+      setError('Network error or AI worker unreachable.');
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-[#161b22] border border-[#30363d] rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#21262d] bg-[#0d1117]">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+              <SparklesIcon size={16} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-[#e6edf3]">Gemini AI Email Generator</h3>
+              <p className="text-[11px] text-[#8b949e]">Generate high-converting outreach powered by Google Gemini</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg bg-[#21262d] hover:bg-[#30363d] text-[#8b949e] hover:text-[#e6edf3] flex items-center justify-center text-sm font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="p-6 overflow-y-auto flex flex-col gap-4 text-xs">
+          {error && (
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 font-medium">
+              {error}
+            </div>
+          )}
+
+          {/* Preset Prompts */}
+          <div>
+            <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Quick Presets</label>
+            <div className="flex flex-wrap gap-2">
+              {PRESET_PROMPTS.map((p, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setPrompt(p.prompt)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                    prompt === p.prompt
+                      ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
+                      : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tone Selector */}
+          <div>
+            <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Tone of Voice</label>
+            <div className="grid grid-cols-2 gap-2">
+              {TONE_OPTIONS.map((t, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setTone(t)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium text-left transition-all ${
+                    tone === t
+                      ? 'bg-purple-600/20 text-purple-300 border-purple-500/50'
+                      : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Prompt Instructions */}
+          <div>
+            <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Instructions / Goal</label>
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows={3}
+              placeholder="Describe what you want Gemini to write..."
+              className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-[#e6edf3] focus:outline-none focus:border-indigo-500 resize-none"
+            />
+          </div>
+
+          {/* Action button */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleGenerate}
+              disabled={generating || !prompt.trim()}
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+            >
+              {generating ? <><SpinnerIcon size={14} /> Generating with Gemini...</> : <><SparklesIcon size={14} /> Generate Email</>}
+            </button>
+          </div>
+
+          {/* Results preview */}
+          {generatedSubject && (
+            <div className="mt-2 p-4 bg-[#0d1117] border border-[#30363d] rounded-xl flex flex-col gap-3">
+              <div>
+                <span className="text-[10px] font-bold text-indigo-400 uppercase">Generated Subject</span>
+                <p className="text-xs font-semibold text-[#e6edf3] mt-0.5">{generatedSubject}</p>
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-indigo-400 uppercase">Generated HTML Body Preview</span>
+                <div
+                  className="mt-1 p-3 bg-white text-black rounded-lg text-xs prose prose-sm max-w-none max-h-48 overflow-y-auto"
+                  dangerouslySetInnerHTML={{ __html: generatedHtmlBody }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3.5 border-t border-[#21262d] bg-[#0d1117] flex justify-between items-center">
+          <button onClick={onClose} className="px-4 py-2 bg-[#21262d] text-[#e6edf3] text-xs font-semibold rounded-xl">
+            Cancel
+          </button>
+          {generatedSubject && (
+            <button
+              onClick={() => {
+                onApply(generatedSubject, generatedHtmlBody);
+                onClose();
+              }}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+            >
+              ✓ Apply to Email Editor
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
