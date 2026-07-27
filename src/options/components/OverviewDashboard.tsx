@@ -8,7 +8,7 @@ interface OverviewDashboardProps {
   linkedinSheetName: string;
   isConfigured: boolean;
   appsScriptUrl: string;
-  onNavigate: (tab: 'dashboard' | 'leads' | 'settings' | 'guide', platform?: 'github' | 'linkedin') => void;
+  onNavigate: (tab: 'dashboard' | 'leads' | 'profile' | 'settings' | 'guide', platform?: 'github' | 'linkedin') => void;
 }
 
 export function OverviewDashboard({
@@ -119,9 +119,13 @@ export function OverviewDashboard({
         <div className="bg-[#161b22] border border-[#30363d] rounded-2xl p-5 flex flex-col justify-between gap-4 shadow-lg">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#8b949e] uppercase tracking-wider">System Status</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <button
+              onClick={() => onNavigate('settings')}
+              title="Open Settings"
+              className="w-8 h-8 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 transition-colors cursor-pointer"
+            >
               <SettingsIcon size={16} />
-            </div>
+            </button>
           </div>
           <div>
             <div className="flex items-center gap-2">
