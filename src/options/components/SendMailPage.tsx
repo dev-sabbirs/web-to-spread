@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MESSAGE_TYPES } from '../../shared/constants';
 import type { MessageResponse } from '../../shared/types';
 import { RichTextEditor } from './RichTextEditor';
+import { ResizableSplitter } from './ResizableSplitter';
+import { AiSidebarWidget } from '../../ai';
 import { SpinnerIcon, MailIcon } from '../icons';
 
 interface LeadItem {
@@ -34,6 +36,51 @@ export function SendMailPage({
   const [htmlBody, setHtmlBody] = useState(
     `<p>Hi ${initialLeadName || 'there'},</p>\n<p>I noticed your profile and wanted to reach out regarding an exciting project.</p>\n<p>Best regards,<br/><strong>Team</strong></p>`
   );
+
+  // Resizable Box Width States
+  const [leftWidth, setLeftWidth] = useState(270);
+  const [rightWidth, setRightWidth] = useState(300);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const startResizeLeft = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = leftWidth;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(180, Math.min(450, startWidth + deltaX));
+      setLeftWidth(newWidth);
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
+  const startResizeRight = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = rightWidth;
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startX - moveEvent.clientX;
+      const newWidth = Math.max(220, Math.min(750, startWidth + deltaX));
+      setRightWidth(newWidth);
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   useEffect(() => {
     if (!isConfigured) return;
@@ -100,6 +147,8 @@ export function SendMailPage({
     window.open(mailtoUrl, '_blank');
   };
 
+  const activeLead = selectedEmails.length === 1 ? leads.find((l) => l.email === selectedEmails[0]) : undefined;
+
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-200">
       <div className="mb-2 pb-4 border-b border-[#21262d]">
@@ -108,16 +157,19 @@ export function SendMailPage({
           Send Mail Center
         </h2>
         <p className="text-xs text-[#8b949e] mt-1">
-          Compose outreach emails using the visual HTML Rich Text Editor & multi-select leads.
+          Drag handles between panels to resize all three boxes.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Lead Filter & Multi-Select */}
-        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col gap-3">
+      <div ref={containerRef} className="flex flex-col lg:flex-row gap-3 items-stretch w-full">
+        {/* Box 1: Left Column (Select Leads Box - Resizable) */}
+        <div
+          style={{ width: `${leftWidth}px` }}
+          className="w-full lg:w-auto shrink-0 bg-[#161b22] border border-[#30363d] rounded-xl p-3 flex flex-col gap-3"
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#e6edf3] uppercase tracking-wider">
-              Select Leads ({selectedEmails.length} selected)
+            <h3 className="text-[11px] font-bold text-[#e6edf3] uppercase tracking-wider truncate">
+              Leads ({selectedEmails.length})
             </h3>
             {leads.length > 0 && (
               <button
@@ -126,9 +178,9 @@ export function SendMailPage({
                     selectedEmails.length === leads.length ? [] : leads.map((l) => l.email)
                   )
                 }
-                className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold"
+                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold shrink-0"
               >
-                {selectedEmails.length === leads.length ? 'Deselect All' : 'Select All'}
+                {selectedEmails.length === leads.length ? 'Clear' : 'All'}
               </button>
             )}
           </div>
@@ -137,26 +189,24 @@ export function SendMailPage({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search leads by name or email..."
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-1.5 text-xs text-[#e6edf3] focus:outline-none focus:border-indigo-500"
+            placeholder="Search..."
+            className="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-2.5 py-1 text-xs text-[#e6edf3] focus:outline-none focus:border-indigo-500"
           />
 
-          <div className="border border-[#21262d] rounded-lg overflow-y-auto max-h-72 divide-y divide-[#21262d] bg-[#0d1117]">
+          <div className="border border-[#21262d] rounded-lg overflow-y-auto max-h-[480px] divide-y divide-[#21262d] bg-[#0d1117]">
             {loading ? (
-              <div className="p-4 text-center text-xs text-[#8b949e] flex items-center justify-center gap-2">
-                <SpinnerIcon size={14} /> Loading lead emails...
+              <div className="p-3 text-center text-xs text-[#8b949e] flex items-center justify-center gap-2">
+                <SpinnerIcon size={14} /> Loading...
               </div>
             ) : filteredLeads.length === 0 ? (
-              <div className="p-4 text-center text-xs text-[#8b949e]">
-                No leads with email found.
-              </div>
+              <div className="p-3 text-center text-xs text-[#8b949e]">No leads found.</div>
             ) : (
               filteredLeads.map((item, idx) => {
                 const isSelected = selectedEmails.includes(item.email);
                 return (
                   <label
                     key={idx}
-                    className={`flex items-start gap-2.5 p-2.5 hover:bg-white/5 cursor-pointer text-xs transition-colors ${
+                    className={`flex items-start gap-2 p-2 hover:bg-white/5 cursor-pointer text-xs transition-colors ${
                       isSelected ? 'bg-indigo-500/10' : ''
                     }`}
                   >
@@ -168,12 +218,12 @@ export function SendMailPage({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-[#e6edf3] truncate">{item.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#21262d] text-[#8b949e] uppercase">
+                        <span className="font-semibold text-[#e6edf3] truncate text-[11px]">{item.name}</span>
+                        <span className="text-[9px] px-1 py-0.2 rounded bg-[#21262d] text-[#8b949e] uppercase shrink-0">
                           {item.source}
                         </span>
                       </div>
-                      <div className="text-[#8b949e] text-[11px] truncate">{item.email}</div>
+                      <div className="text-[#8b949e] text-[10px] truncate">{item.email}</div>
                     </div>
                   </label>
                 );
@@ -182,8 +232,11 @@ export function SendMailPage({
           </div>
         </div>
 
-        {/* Right Column: Mail Composer Form with Rich Text Editor */}
-        <div className="lg:col-span-2 bg-[#161b22] border border-[#30363d] rounded-xl p-5 flex flex-col gap-4">
+        {/* Resizable Splitter 1 */}
+        <ResizableSplitter onMouseDown={startResizeLeft} />
+
+        {/* Box 2: Middle Column (Mail Composer Box - Auto Flex) */}
+        <div className="flex-1 min-w-[300px] bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col gap-4">
           <div>
             <label className="block text-xs font-semibold text-[#8b949e] mb-1">Subject</label>
             <input
@@ -201,15 +254,11 @@ export function SendMailPage({
               value={htmlBody}
               onChange={setHtmlBody}
               onApplySubject={setSubject}
-              leadContext={
-                selectedEmails.length === 1
-                  ? leads.find((l) => l.email === selectedEmails[0])
-                  : undefined
-              }
+              leadContext={activeLead}
             />
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex justify-end pt-1">
             <button
               onClick={handleSend}
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-colors shadow-lg shadow-emerald-600/20 flex items-center gap-2"
@@ -217,6 +266,18 @@ export function SendMailPage({
               <MailIcon size={16} /> Send Email ({selectedEmails.length} recipients)
             </button>
           </div>
+        </div>
+
+        {/* Resizable Splitter 2 */}
+        <ResizableSplitter onMouseDown={startResizeRight} />
+
+        {/* Box 3: Right Column (AI Agent Box - Resizable) */}
+        <div style={{ width: `${rightWidth}px` }} className="w-full lg:w-auto shrink-0">
+          <AiSidebarWidget
+            leadContext={activeLead}
+            onSubjectGenerated={(subj) => setSubject(subj)}
+            onStreamChunk={(chunkHtml) => setHtmlBody(chunkHtml)}
+          />
         </div>
       </div>
     </div>

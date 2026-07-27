@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { SparklesIcon } from "../icons";
-import { AiEmailModal } from "./AiEmailModal";
+import { AiEmailModal } from "../../ai";
 import { LinkModal } from "./LinkModal";
 
 interface RichTextEditorProps {

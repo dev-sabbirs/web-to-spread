@@ -1,56 +1,44 @@
 import React, { useState } from 'react';
-import { MESSAGE_TYPES } from '../../shared/constants';
-import type { MessageResponse } from '../../shared/types';
-import { SparklesIcon, SpinnerIcon } from '../icons';
+import { PRESET_PROMPTS, TONE_OPTIONS } from '../config';
+import { generateEmailWithGemini } from '../services/geminiService';
+import { SparklesIcon, SpinnerIcon } from '../../options/icons';
 
 interface AiEmailModalProps {
   onClose: () => void;
   onApply: (generatedSubject: string, generatedHtmlBody: string) => void;
-  leadContext?: {
-    name?: string;
-    headline?: string;
-    bio?: string;
-    email?: string;
-  };
+  leadContext?: { name?: string; headline?: string; bio?: string; email?: string };
 }
 
-const PRESET_PROMPTS = [
-  { label: 'Cold Outreach', prompt: 'Write a compelling cold email introducing our web development and automation services.' },
-  { label: 'Follow Up', prompt: 'Write a polite follow-up email regarding our previous message and check their availability.' },
-  { label: 'Feature Pitch', prompt: 'Write a personalized pitch highlighting how our solution saves hours of lead extraction.' },
-];
-
-const TONE_OPTIONS = ['Professional & Friendly', 'Persuasive & High Energy', 'Short & Direct', 'Casual & Conversational'];
-
 export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProps) {
-  const [prompt, setPrompt] = useState(PRESET_PROMPTS[0].prompt);
-  const [tone, setTone] = useState(TONE_OPTIONS[0]);
+  const [prompt, setPrompt] = useState<string>(PRESET_PROMPTS[0].prompt);
+  const [tone, setTone] = useState<string>(TONE_OPTIONS[0]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedSubject, setGeneratedSubject] = useState('');
   const [generatedHtmlBody, setGeneratedHtmlBody] = useState('');
 
   const handleGenerate = async () => {
+    const apiKey = import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
+    if (!apiKey) {
+      setError('VITE_AISTUDIO_GEMINI_API_KEY is not set in .env');
+      return;
+    }
     if (!prompt.trim()) return;
+
     setGenerating(true);
     setError(null);
+
     try {
-      const res: MessageResponse = await chrome.runtime.sendMessage({
-        type: MESSAGE_TYPES.GENERATE_AI_EMAIL,
+      const res = await generateEmailWithGemini({
+        apiKey,
         prompt,
         tone,
         leadContext,
       });
-
-      if (res.success && res.data?.rows?.[0]) {
-        const [subj, body] = res.data.rows[0];
-        setGeneratedSubject(subj);
-        setGeneratedHtmlBody(body);
-      } else {
-        setError(res.error || 'Failed to generate email content.');
-      }
-    } catch {
-      setError('Network error or AI worker unreachable.');
+      setGeneratedSubject(res.subject);
+      setGeneratedHtmlBody(res.htmlBody);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to generate email content');
     } finally {
       setGenerating(false);
     }
@@ -86,7 +74,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
             </div>
           )}
 
-          {/* Preset Prompts */}
           <div>
             <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Quick Presets</label>
             <div className="flex flex-wrap gap-2">
@@ -106,7 +93,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
             </div>
           </div>
 
-          {/* Tone Selector */}
           <div>
             <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Tone of Voice</label>
             <div className="grid grid-cols-2 gap-2">
@@ -126,7 +112,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
             </div>
           </div>
 
-          {/* Prompt Instructions */}
           <div>
             <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Instructions / Goal</label>
             <textarea
@@ -138,7 +123,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
             />
           </div>
 
-          {/* Action button */}
           <div className="flex justify-end">
             <button
               onClick={handleGenerate}
@@ -149,7 +133,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
             </button>
           </div>
 
-          {/* Results preview */}
           {generatedSubject && (
             <div className="mt-2 p-4 bg-[#0d1117] border border-[#30363d] rounded-xl flex flex-col gap-3">
               <div>
@@ -167,7 +150,6 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-3.5 border-t border-[#21262d] bg-[#0d1117] flex justify-between items-center">
           <button onClick={onClose} className="px-4 py-2 bg-[#21262d] text-[#e6edf3] text-xs font-semibold rounded-xl">
             Cancel
