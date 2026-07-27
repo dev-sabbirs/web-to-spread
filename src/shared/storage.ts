@@ -7,6 +7,8 @@ import {
   DEFAULT_LINKEDIN_SHEET_NAME,
 } from "./constants";
 
+export type AppTheme = 'dark' | 'light' | 'system';
+
 export interface StoredSettings {
   appsScriptUrl: string;
   sheetName: string;
@@ -14,6 +16,7 @@ export interface StoredSettings {
   linkedinSheetName: string;
   geminiApiKey: string;
   geminiModel: string;
+  theme?: AppTheme;
 }
 
 export interface UserProfile {
@@ -45,6 +48,7 @@ export async function getSettings(): Promise<StoredSettings> {
     STORAGE_KEYS.LINKEDIN_SHEET_NAME,
     STORAGE_KEYS.GEMINI_API_KEY,
     STORAGE_KEYS.GEMINI_MODEL,
+    STORAGE_KEYS.THEME,
   ]);
   const defaultUrl = import.meta.env.VITE_APPS_SCRIPT_URL || "";
   const defaultApiKey = import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY || "";
@@ -59,6 +63,7 @@ export async function getSettings(): Promise<StoredSettings> {
       DEFAULT_LINKEDIN_SHEET_NAME,
     geminiApiKey: (data[STORAGE_KEYS.GEMINI_API_KEY] as string) || defaultApiKey,
     geminiModel: (data[STORAGE_KEYS.GEMINI_MODEL] as string) || DEFAULT_GEMINI_MODEL,
+    theme: (data[STORAGE_KEYS.THEME] as AppTheme) || "dark",
   };
 }
 

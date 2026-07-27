@@ -177,6 +177,7 @@ export default function Options() {
               linkedinSheetName={hook.settings.linkedinSheetName}
               geminiApiKey={hook.settings.geminiApiKey}
               geminiModel={hook.settings.geminiModel}
+              theme={hook.settings.theme}
               isValidUrl={hook.isValidUrl}
               isConfigured={hook.isConfigured}
               saveState={hook.saveState}
@@ -188,6 +189,7 @@ export default function Options() {
               onLinkedinSheetNameChange={hook.updateLinkedinSheetName}
               onGeminiApiKeyChange={hook.updateGeminiApiKey}
               onGeminiModelChange={hook.updateGeminiModel}
+              onThemeChange={hook.updateTheme}
               onSave={hook.save}
               onTest={hook.testConnection}
             />

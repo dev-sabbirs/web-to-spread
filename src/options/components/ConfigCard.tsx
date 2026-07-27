@@ -1,6 +1,7 @@
 import { CheckCircleIcon, AlertIcon, SpinnerIcon, ExternalLinkIcon } from '../icons';
 import { APPS_SCRIPT_URL_PREFIX } from '../../shared/constants';
 import type { SaveState, TestState } from '../../shared/types';
+import type { AppTheme } from '../../shared/storage';
 
 interface ConfigCardProps {
   url: string;
@@ -8,6 +9,7 @@ interface ConfigCardProps {
   linkedinSheetName: string;
   geminiApiKey: string;
   geminiModel: string;
+  theme?: AppTheme;
   isValidUrl: boolean;
   isConfigured: boolean;
   saveState: SaveState;
@@ -19,14 +21,15 @@ interface ConfigCardProps {
   onLinkedinSheetNameChange: (v: string) => void;
   onGeminiApiKeyChange: (v: string) => void;
   onGeminiModelChange: (v: string) => void;
+  onThemeChange: (v: AppTheme) => void;
   onSave: () => void;
   onTest: () => void;
 }
 
 export function ConfigCard({
-  url, githubSheetName, linkedinSheetName, geminiApiKey, geminiModel, isValidUrl, isConfigured,
+  url, githubSheetName, linkedinSheetName, geminiApiKey, geminiModel, theme = 'dark', isValidUrl, isConfigured,
   saveState, saveMsg, testState, testMsg,
-  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onGeminiApiKeyChange, onGeminiModelChange, onSave, onTest,
+  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onGeminiApiKeyChange, onGeminiModelChange, onThemeChange, onSave, onTest,
 }: ConfigCardProps) {
   const isTesting = testState === 'testing';
   const isSaving  = saveState === 'saving';
@@ -121,6 +124,49 @@ export function ConfigCard({
             onChange={(e) => onLinkedinSheetNameChange(e.target.value)}
           />
           <p className="text-xs text-[#737373]">Target tab for LinkedIn profiles.</p>
+        </div>
+      </div>
+
+      {/* Theme Preference Section */}
+      <div className="pt-4 border-t border-[#1c1c1c] flex flex-col gap-3">
+        <div>
+          <h4 className="text-xs font-bold text-[#f5f5f5] uppercase tracking-wider">Appearance Theme</h4>
+          <p className="text-xs text-[#737373] mt-0.5">Switch workspace appearance theme across Dark, Light, or System preference.</p>
+        </div>
+        <div className="grid grid-cols-3 gap-3 max-w-md">
+          <button
+            type="button"
+            onClick={() => onThemeChange('dark')}
+            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              theme === 'dark'
+                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
+                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
+            }`}
+          >
+            <span>🌙</span> Dark
+          </button>
+          <button
+            type="button"
+            onClick={() => onThemeChange('light')}
+            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              theme === 'light'
+                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
+                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
+            }`}
+          >
+            <span>☀️</span> Light
+          </button>
+          <button
+            type="button"
+            onClick={() => onThemeChange('system')}
+            className={`px-4 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              theme === 'system'
+                ? 'bg-[#262626] text-white border-[#404040] shadow-md'
+                : 'bg-[#141414] border-[#262626] text-[#737373] hover:text-[#f5f5f5]'
+            }`}
+          >
+            <span>💻</span> System
+          </button>
         </div>
       </div>
 
