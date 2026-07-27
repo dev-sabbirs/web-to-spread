@@ -8,12 +8,14 @@ import { HowItWorks } from './components/HowItWorks';
 import { useSettings } from './hooks/useSettings';
 import './styles/tailwind.css';
 
-type TabId = 'dashboard' | 'leads' | 'settings' | 'guide';
+import { SendMailPage } from './components/SendMailPage';
+
+type TabId = 'dashboard' | 'leads' | 'send-mail' | 'settings' | 'guide';
 
 function getInitialTabState(): { tab: TabId; platform: 'github' | 'linkedin' } {
   const hash = window.location.hash.replace(/^#/, '');
   const [tabPart, queryPart] = hash.split('?');
-  const validTabs: TabId[] = ['dashboard', 'leads', 'settings', 'guide'];
+  const validTabs: TabId[] = ['dashboard', 'leads', 'send-mail', 'settings', 'guide'];
 
   const tab = validTabs.includes(tabPart as TabId) ? (tabPart as TabId) : 'dashboard';
 
@@ -32,6 +34,8 @@ export default function Options() {
   const initial = getInitialTabState();
   const [activeTab, setActiveTab] = useState<TabId>(initial.tab);
   const [leadsPlatform, setLeadsPlatform] = useState<'github' | 'linkedin'>(initial.platform);
+  const [selectedMailLead, setSelectedMailLead] = useState<{ email?: string; name?: string }>({});
+
 
   // Synchronize state with URL hash changes (back/forward navigation, manual hash edits, page reloads)
   React.useEffect(() => {
@@ -104,6 +108,17 @@ export default function Options() {
           </section>
         )}
 
+        {/* ── Send Mail Tab ── */}
+        {activeTab === 'send-mail' && (
+          <SendMailPage
+            githubSheetName={hook.settings.githubSheetName}
+            linkedinSheetName={hook.settings.linkedinSheetName}
+            isConfigured={hook.isConfigured}
+            initialLeadEmail={selectedMailLead.email}
+            initialLeadName={selectedMailLead.name}
+          />
+        )}
+
         {/* ── Leads Tab ── */}
         {activeTab === 'leads' && (
           <section id="leads" className="animate-in fade-in duration-200">
@@ -117,6 +132,10 @@ export default function Options() {
               linkedinSheetName={hook.settings.linkedinSheetName}
               isConfigured={hook.isConfigured}
               initialPlatform={leadsPlatform}
+              onNavigateToSendMail={(email, name) => {
+                setSelectedMailLead({ email, name });
+                handleSelectTab('send-mail');
+              }}
             />
           </section>
         )}
