@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { PRESET_PROMPTS, TONE_OPTIONS } from '../config';
+import React, { useState, useEffect } from 'react';
+import { MODE_PRESETS, TONE_OPTIONS } from '../config';
 import { generateEmailWithGemini } from '../services/geminiService';
+import { getUserProfile, type UserProfile } from '../../shared/storage';
 import { SparklesIcon, SpinnerIcon } from '../../options/icons';
 
 interface AiEmailModalProps {
@@ -10,12 +11,17 @@ interface AiEmailModalProps {
 }
 
 export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProps) {
-  const [prompt, setPrompt] = useState<string>(PRESET_PROMPTS[0].prompt);
+  const [prompt, setPrompt] = useState<string>(MODE_PRESETS.client[0].prompt);
   const [tone, setTone] = useState<string>(TONE_OPTIONS[0]);
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>(undefined);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedSubject, setGeneratedSubject] = useState('');
   const [generatedHtmlBody, setGeneratedHtmlBody] = useState('');
+
+  useEffect(() => {
+    getUserProfile().then(setUserProfile);
+  }, []);
 
   const handleGenerate = async () => {
     const apiKey = import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
@@ -34,6 +40,7 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
         prompt,
         tone,
         leadContext,
+        senderProfile: userProfile,
       });
       setGeneratedSubject(res.subject);
       setGeneratedHtmlBody(res.htmlBody);
@@ -77,7 +84,7 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
           <div>
             <label className="block text-[11px] font-semibold text-[#8b949e] uppercase mb-1.5">Quick Presets</label>
             <div className="flex flex-wrap gap-2">
-              {PRESET_PROMPTS.map((p, idx) => (
+              {MODE_PRESETS.client.map((p: { label: string; prompt: string }, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setPrompt(p.prompt)}

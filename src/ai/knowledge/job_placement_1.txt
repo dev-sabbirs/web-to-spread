@@ -1,0 +1,10 @@
+Hi [Name],
+
+I noticed your work leading engineering/recruiting at [Company] and wanted to reach out directly.
+
+I'm a Full-Stack Software Engineer specializing in high-performance web applications, React, TypeScript, and modern backend systems. I've built scalable tools and browser extensions that streamline business operations and data workflows.
+
+I'm currently exploring new Software Engineer opportunities where I can contribute to building robust products. If your team is looking for a dedicated engineer with strong problem-solving skills, I'd love to share my portfolio and discuss how I can contribute.
+
+Best regards,
+Sabbir

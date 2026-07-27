@@ -1,10 +1,12 @@
 import { AI_CONFIG, SYSTEM_INSTRUCTIONS } from '../config';
+import type { UserProfile } from '../../shared/storage';
 
 export interface GenerateParams {
   apiKey: string;
   prompt: string;
   tone?: string;
   leadContext?: { name?: string; headline?: string; bio?: string };
+  senderProfile?: UserProfile;
 }
 
 export interface GeneratedEmailResult {
@@ -17,8 +19,19 @@ export async function generateEmailWithGemini({
   prompt,
   tone = 'Professional',
   leadContext,
+  senderProfile,
 }: GenerateParams): Promise<GeneratedEmailResult> {
-  const userContextPrompt = `Goal: ${prompt}\nTone: ${tone}\n${
+  const senderContext = senderProfile
+    ? `Sender Profile (You):
+- Name: ${senderProfile.name}
+- Role/Title: ${senderProfile.title}
+- Email: ${senderProfile.email || 'N/A'}
+- Portfolio: ${senderProfile.website || 'N/A'}
+- Bio/Background: ${senderProfile.bio}
+- Pitch Offer: ${senderProfile.pitchGoal}`
+    : '';
+
+  const userContextPrompt = `Goal: ${prompt}\nTone: ${tone}\n\n${senderContext}\n\n${
     leadContext
       ? `Recipient Context: Name: ${leadContext.name || 'Prospect'}, Title: ${
           leadContext.headline || 'Professional'
@@ -35,7 +48,7 @@ export async function generateEmailWithGemini({
       contents: [
         {
           role: 'user',
-          parts: [{ text: SYSTEM_INSTRUCTIONS.EMAIL_COPYWRITER }, { text: userContextPrompt }],
+          parts: [{ text: SYSTEM_INSTRUCTIONS.client.email }, { text: userContextPrompt }],
         },
       ],
       generationConfig: {

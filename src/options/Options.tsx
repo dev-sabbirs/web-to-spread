@@ -9,13 +9,14 @@ import { useSettings } from './hooks/useSettings';
 import './styles/tailwind.css';
 
 import { SendMailPage } from './components/SendMailPage';
+import { UserProfileCard } from './components/UserProfileCard';
 
-type TabId = 'dashboard' | 'leads' | 'send-mail' | 'settings' | 'guide';
+type TabId = 'dashboard' | 'leads' | 'send-mail' | 'profile' | 'settings' | 'guide';
 
 function getInitialTabState(): { tab: TabId; platform: 'github' | 'linkedin' } {
   const hash = window.location.hash.replace(/^#/, '');
   const [tabPart, queryPart] = hash.split('?');
-  const validTabs: TabId[] = ['dashboard', 'leads', 'send-mail', 'settings', 'guide'];
+  const validTabs: TabId[] = ['dashboard', 'leads', 'send-mail', 'profile', 'settings', 'guide'];
 
   const tab = validTabs.includes(tabPart as TabId) ? (tabPart as TabId) : 'dashboard';
 
@@ -137,6 +138,17 @@ export default function Options() {
                 handleSelectTab('send-mail');
               }}
             />
+          </section>
+        )}
+
+        {/* ── Personal Profile AI Tab ── */}
+        {activeTab === 'profile' && (
+          <section id="profile" className="animate-in fade-in duration-200">
+            <div className="mb-6 pb-4 border-b border-[#21262d]">
+              <h2 className="text-xl font-bold text-[#e6edf3]">My Personal AI Profile</h2>
+              <p className="text-xs text-[#8b949e] mt-1">Configure your personal background, portfolio, and value offer so Gemini AI writes authentic outreach as you.</p>
+            </div>
+            <UserProfileCard />
           </section>
         )}
 

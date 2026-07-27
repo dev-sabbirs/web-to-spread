@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", Icon: DashboardIcon },
   { id: "leads", label: "Leads", Icon: UsersIcon },
   { id: "send-mail", label: "Send Mail", Icon: MailIcon },
+  { id: "profile", label: "My Profile AI", Icon: PhoneIcon },
   { id: "settings", label: "Settings", Icon: SettingsIcon },
   { id: "guide", label: "Setup Guide", Icon: BookIcon },
 ] as const;

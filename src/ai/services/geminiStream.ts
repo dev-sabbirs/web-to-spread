@@ -1,10 +1,14 @@
-import { AI_CONFIG, SYSTEM_INSTRUCTIONS } from '../config';
+import { AI_CONFIG, SYSTEM_INSTRUCTIONS, type AiMode } from '../config';
+import { getFormattedTrainingPrompt } from './knowledgeLoader';
+import type { UserProfile } from '../../shared/storage';
 
 export interface StreamParams {
   apiKey: string;
   prompt: string;
   tone: string;
+  mode?: AiMode;
   leadContext?: { name?: string; headline?: string; bio?: string };
+  senderProfile?: UserProfile;
   onChunk: (text: string) => void;
   onSubject?: (subject: string) => void;
 }
@@ -13,11 +17,16 @@ export async function streamEmailGeneration({
   apiKey,
   prompt,
   tone,
+  mode = 'client',
   leadContext,
+  senderProfile,
   onChunk,
   onSubject,
 }: StreamParams): Promise<void> {
-  // 1. Generate Subject First
+  const trainingContext = getFormattedTrainingPrompt(mode);
+  const systemInstructionText = SYSTEM_INSTRUCTIONS[mode].stream;
+
+  // 1. Generate Subject Line First
   if (onSubject) {
     try {
       const subjRes = await fetch(
@@ -26,7 +35,19 @@ export async function streamEmailGeneration({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: `Generate ONLY a short subject line for an email with goal: ${prompt}` }] }],
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Generate a short, compelling email subject line for reaching out to (${
+                      leadContext?.name || 'Recipient'
+                    } - ${leadContext?.headline || ''}) for ${
+                      mode === 'job' ? 'a Software Engineer Job Opportunity' : 'Client Acquisition Web Development'
+                    } with goal: ${prompt}. Output ONLY the subject line text.`,
+                  },
+                ],
+              },
+            ],
           }),
         }
       );
@@ -42,10 +63,35 @@ export async function streamEmailGeneration({
     }
   }
 
-  // 2. Stream Body Content
-  const userPrompt = `Goal: ${prompt}\nTone: ${tone}\n${
-    leadContext?.name ? `Recipient Name: ${leadContext.name}\n` : ''
-  }${leadContext?.headline ? `Recipient Title: ${leadContext.headline}` : ''}`;
+  // 2. Stream Email Body Content
+  const senderContext = senderProfile
+    ? `Sender Profile (You):
+- Name: ${senderProfile.name || 'Sabbir'}
+- Role/Title: ${senderProfile.title || 'Software Engineer'}
+- Email: ${senderProfile.email || 'N/A'}
+- Portfolio: ${senderProfile.website || 'N/A'}
+- Bio/Background: ${senderProfile.bio || 'N/A'}
+- Pitch Offer: ${senderProfile.pitchGoal || 'N/A'}`
+    : '';
+
+  const userPrompt = `Mode: ${mode.toUpperCase()} OUTREACH
+Outreach Goal: ${prompt}
+Tone: ${tone}
+
+${senderContext}
+
+${
+  leadContext
+    ? `Target Recipient Details:
+- Name: ${leadContext.name || 'Recipient'}
+- Headline/Title: ${leadContext.headline || 'Professional'}
+- Context/Bio: ${leadContext.bio || 'N/A'}`
+    : ''
+}
+
+Please write a highly tailored email body matching the sender background, recipient context, and mode instructions.`;
+
+  const systemInstructionWithTraining = `${systemInstructionText}${trainingContext}`;
 
   const streamUrl = `${AI_CONFIG.BASE_URL}/${AI_CONFIG.DEFAULT_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`;
   const response = await fetch(streamUrl, {
@@ -55,7 +101,7 @@ export async function streamEmailGeneration({
       contents: [
         {
           role: 'user',
-          parts: [{ text: SYSTEM_INSTRUCTIONS.STREAM_COPYWRITER }, { text: userPrompt }],
+          parts: [{ text: systemInstructionWithTraining }, { text: userPrompt }],
         },
       ],
       generationConfig: { temperature: 0.7 },
@@ -89,7 +135,7 @@ export async function streamEmailGeneration({
             onChunk(cleanHtml);
           }
         } catch {
-          // ignore step parsing
+          // ignore chunk parse
         }
       }
     }

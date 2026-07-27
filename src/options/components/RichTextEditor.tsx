@@ -30,14 +30,14 @@ export function RichTextEditor({
   const [linkUrl, setLinkUrl] = useState("");
   const [linkText, setLinkText] = useState("");
 
-  // Synchronize initial content to contentEditable DOM node without causing cursor jumps
+  // Synchronize incoming content (including streaming AI updates) to contentEditable DOM node
   useEffect(() => {
     if (editorRef.current && viewMode === "visual") {
       if (editorRef.current.innerHTML !== value) {
         editorRef.current.innerHTML = value;
       }
     }
-  }, [viewMode]);
+  }, [value, viewMode]);
 
   const exec = (command: string, val: string | undefined = undefined) => {
     document.execCommand(command, false, val);

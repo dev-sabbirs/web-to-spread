@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   SHEET_NAME: 'sheetName', // legacy / default sheet
   GITHUB_SHEET_NAME: 'githubSheetName',
   LINKEDIN_SHEET_NAME: 'linkedinSheetName',
+  USER_PROFILE: 'userProfile',
 } as const;
 
 export const ELEMENT_IDS = {

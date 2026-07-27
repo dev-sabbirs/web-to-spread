@@ -5,8 +5,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "tsc && vite build --watch",
     "dev": "vite",
+    "start": "vite build --watch",
+    "watch": "vite build --watch",
     "build": "tsc && vite build"
   },
   "dependencies": {
