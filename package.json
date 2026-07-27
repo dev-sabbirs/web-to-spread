@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "tsc && vite build --watch",
     "dev": "vite",
     "build": "tsc && vite build"
   },
