@@ -6,6 +6,8 @@ interface ConfigCardProps {
   url: string;
   githubSheetName: string;
   linkedinSheetName: string;
+  geminiApiKey: string;
+  geminiModel: string;
   isValidUrl: boolean;
   isConfigured: boolean;
   saveState: SaveState;
@@ -15,14 +17,16 @@ interface ConfigCardProps {
   onUrlChange: (v: string) => void;
   onGithubSheetNameChange: (v: string) => void;
   onLinkedinSheetNameChange: (v: string) => void;
+  onGeminiApiKeyChange: (v: string) => void;
+  onGeminiModelChange: (v: string) => void;
   onSave: () => void;
   onTest: () => void;
 }
 
 export function ConfigCard({
-  url, githubSheetName, linkedinSheetName, isValidUrl, isConfigured,
+  url, githubSheetName, linkedinSheetName, geminiApiKey, geminiModel, isValidUrl, isConfigured,
   saveState, saveMsg, testState, testMsg,
-  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onSave, onTest,
+  onUrlChange, onGithubSheetNameChange, onLinkedinSheetNameChange, onGeminiApiKeyChange, onGeminiModelChange, onSave, onTest,
 }: ConfigCardProps) {
   const isTesting = testState === 'testing';
   const isSaving  = saveState === 'saving';
@@ -117,6 +121,55 @@ export function ConfigCard({
             onChange={(e) => onLinkedinSheetNameChange(e.target.value)}
           />
           <p className="text-xs text-[#8b949e]">Target tab for LinkedIn profiles.</p>
+        </div>
+      </div>
+
+      {/* Gemini AI Settings Section */}
+      <div className="pt-4 border-t border-[#21262d] flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-xs font-bold text-[#e6edf3] uppercase tracking-wider">Gemini AI Studio Credentials</h4>
+            <p className="text-xs text-[#8b949e] mt-0.5">Customize your own API Key and Gemini Model tier.</p>
+          </div>
+          <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded">
+            Default: System Key Active
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2 flex flex-col gap-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="gemini-api-key">
+              Custom Gemini API Key
+            </label>
+            <input
+              id="gemini-api-key"
+              type="password"
+              className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              placeholder="AIzaSy... (Leave empty to use system default key)"
+              value={geminiApiKey}
+              onChange={(e) => onGeminiApiKeyChange(e.target.value)}
+            />
+            <p className="text-[11px] text-[#8b949e]">
+              If left blank, the extension automatically uses your built-in environment AI key.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="gemini-model">
+              Gemini Model Tier
+            </label>
+            <select
+              id="gemini-model"
+              className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-semibold text-[#e6edf3] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+              value={geminiModel || "gemini-3.6-flash"}
+              onChange={(e) => onGeminiModelChange(e.target.value)}
+            >
+              <option value="gemini-3.6-flash">Gemini 3.6 Flash (Fast & Default)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Context)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
+            </select>
+            <p className="text-[11px] text-[#8b949e]">Model endpoint for content generation.</p>
+          </div>
         </div>
       </div>
 

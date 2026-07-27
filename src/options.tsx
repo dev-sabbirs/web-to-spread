@@ -5,5 +5,5 @@ import Options from "./options/Options";
 ReactDOM.createRoot(document.body).render(
   <React.StrictMode>
     <Options />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

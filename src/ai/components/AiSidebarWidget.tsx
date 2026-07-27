@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { PRESET_PROMPTS, TONE_OPTIONS } from '../config';
+import React, { useState, useEffect } from 'react';
+import { MODE_PRESETS, TONE_OPTIONS, type AiMode } from '../config';
 import { streamEmailGeneration } from '../services/geminiStream';
+import { getUserProfile, getSettings, type UserProfile } from '../../shared/storage';
 import { SparklesIcon, SpinnerIcon } from '../../options/icons';
 
 interface AiSidebarWidgetProps {
@@ -14,15 +15,32 @@ export function AiSidebarWidget({
   onStreamChunk,
   onSubjectGenerated,
 }: AiSidebarWidgetProps) {
-  const [prompt, setPrompt] = useState<string>(PRESET_PROMPTS[0].prompt);
+  const [mode, setMode] = useState<AiMode>('client');
+  const [prompt, setPrompt] = useState<string>(MODE_PRESETS.client[0].prompt);
   const [tone, setTone] = useState<string>(TONE_OPTIONS[0]);
+  const [userProfile, setUserProfile] = useState<UserProfile | undefined>(undefined);
+  const [customApiKey, setCustomApiKey] = useState<string>('');
+  const [customModel, setCustomModel] = useState<string>('gemini-3.6-flash');
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    getUserProfile().then(setUserProfile);
+    getSettings().then((s) => {
+      setCustomApiKey(s.geminiApiKey);
+      setCustomModel(s.geminiModel);
+    });
+  }, []);
+
+  const handleModeChange = (newMode: AiMode) => {
+    setMode(newMode);
+    setPrompt(MODE_PRESETS[newMode][0].prompt);
+  };
+
   const handleGenerateStream = async () => {
-    const apiKey = import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
+    const apiKey = customApiKey || import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
     if (!apiKey) {
-      setError('VITE_AISTUDIO_GEMINI_API_KEY is not set in .env');
+      setError('Gemini API key is not configured in Settings or .env');
       return;
     }
     if (!prompt.trim()) return;
@@ -33,9 +51,12 @@ export function AiSidebarWidget({
     try {
       await streamEmailGeneration({
         apiKey,
+        model: customModel,
         prompt,
         tone,
+        mode,
         leadContext,
+        senderProfile: userProfile,
         onChunk: onStreamChunk,
         onSubject: onSubjectGenerated,
       });
@@ -45,6 +66,8 @@ export function AiSidebarWidget({
       setIsStreaming(false);
     }
   };
+
+  const currentPresets = MODE_PRESETS[mode];
 
   return (
     <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 flex flex-col gap-4 text-xs">
@@ -58,6 +81,30 @@ export function AiSidebarWidget({
         </span>
       </div>
 
+      {/* Mode Selector Tabs */}
+      <div className="grid grid-cols-2 gap-1 p-1 bg-[#0d1117] border border-[#30363d] rounded-lg">
+        <button
+          onClick={() => handleModeChange('client')}
+          className={`py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+            mode === 'client'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'text-[#8b949e] hover:text-[#e6edf3]'
+          }`}
+        >
+          💼 Client Acquisition
+        </button>
+        <button
+          onClick={() => handleModeChange('job')}
+          className={`py-1.5 text-[11px] font-bold rounded-md transition-colors ${
+            mode === 'job'
+              ? 'bg-purple-600 text-white shadow-sm'
+              : 'text-[#8b949e] hover:text-[#e6edf3]'
+          }`}
+        >
+          🚀 Job Placement
+        </button>
+      </div>
+
       {error && (
         <div className="p-2.5 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-[11px]">
           {error}
@@ -66,15 +113,19 @@ export function AiSidebarWidget({
 
       {/* Quick Presets */}
       <div>
-        <label className="block text-[10px] font-semibold text-[#8b949e] uppercase mb-1">Presets</label>
+        <label className="block text-[10px] font-semibold text-[#8b949e] uppercase mb-1">
+          {mode === 'client' ? 'Client Pitch Presets' : 'Job Outreach Presets'}
+        </label>
         <div className="flex flex-wrap gap-1.5">
-          {PRESET_PROMPTS.map((p, i) => (
+          {currentPresets.map((p, i) => (
             <button
               key={i}
               onClick={() => setPrompt(p.prompt)}
               className={`px-2 py-1 rounded border text-[11px] font-medium transition-all ${
                 prompt === p.prompt
-                  ? 'bg-purple-600/20 text-purple-300 border-purple-500/50'
+                  ? mode === 'client'
+                    ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50'
+                    : 'bg-purple-600/20 text-purple-300 border-purple-500/50'
                   : 'bg-[#0d1117] border-[#30363d] text-[#8b949e] hover:text-[#e6edf3]'
               }`}
             >
@@ -120,7 +171,11 @@ export function AiSidebarWidget({
       <button
         onClick={handleGenerateStream}
         disabled={isStreaming || !prompt.trim()}
-        className="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 text-xs disabled:opacity-50"
+        className={`w-full py-2.5 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 text-xs disabled:opacity-50 ${
+          mode === 'client'
+            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500'
+            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
+        }`}
       >
         {isStreaming ? (
           <>
@@ -128,7 +183,7 @@ export function AiSidebarWidget({
           </>
         ) : (
           <>
-            <SparklesIcon size={14} /> Write Email Live
+            <SparklesIcon size={14} /> {mode === 'client' ? 'Write Client Pitch Live' : 'Write Job Outreach Live'}
           </>
         )}
       </button>
