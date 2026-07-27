@@ -14,6 +14,9 @@ export const STORAGE_KEYS = {
   GITHUB_SHEET_NAME: 'githubSheetName',
   LINKEDIN_SHEET_NAME: 'linkedinSheetName',
   USER_PROFILE: 'userProfile',
+  GEMINI_API_KEY: 'geminiApiKey',
+  GEMINI_MODEL: 'geminiModel',
+  AI_USAGE_STATS: 'aiUsageStats',
 } as const;
 
 export const ELEMENT_IDS = {

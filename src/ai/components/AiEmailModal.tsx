@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MODE_PRESETS, TONE_OPTIONS } from '../config';
 import { generateEmailWithGemini } from '../services/geminiService';
-import { getUserProfile, type UserProfile } from '../../shared/storage';
+import { getUserProfile, getSettings, type UserProfile } from '../../shared/storage';
 import { SparklesIcon, SpinnerIcon } from '../../options/icons';
 
 interface AiEmailModalProps {
@@ -14,6 +14,8 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
   const [prompt, setPrompt] = useState<string>(MODE_PRESETS.client[0].prompt);
   const [tone, setTone] = useState<string>(TONE_OPTIONS[0]);
   const [userProfile, setUserProfile] = useState<UserProfile | undefined>(undefined);
+  const [customApiKey, setCustomApiKey] = useState<string>('');
+  const [customModel, setCustomModel] = useState<string>('gemini-3.6-flash');
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedSubject, setGeneratedSubject] = useState('');
@@ -21,12 +23,16 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
 
   useEffect(() => {
     getUserProfile().then(setUserProfile);
+    getSettings().then((s) => {
+      setCustomApiKey(s.geminiApiKey);
+      setCustomModel(s.geminiModel);
+    });
   }, []);
 
   const handleGenerate = async () => {
-    const apiKey = import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
+    const apiKey = customApiKey || import.meta.env.VITE_AISTUDIO_GEMINI_API_KEY;
     if (!apiKey) {
-      setError('VITE_AISTUDIO_GEMINI_API_KEY is not set in .env');
+      setError('Gemini API key is not configured in Settings or .env');
       return;
     }
     if (!prompt.trim()) return;
@@ -37,6 +43,7 @@ export function AiEmailModal({ onClose, onApply, leadContext }: AiEmailModalProp
     try {
       const res = await generateEmailWithGemini({
         apiKey,
+        model: customModel,
         prompt,
         tone,
         leadContext,

@@ -10,6 +10,8 @@ export interface UseSettingsReturn {
   updateUrl: (v: string) => void;
   updateGithubSheetName: (v: string) => void;
   updateLinkedinSheetName: (v: string) => void;
+  updateGeminiApiKey: (v: string) => void;
+  updateGeminiModel: (v: string) => void;
   save: () => Promise<void>;
   saveState: SaveState;
   saveMsg: string;
@@ -26,6 +28,8 @@ export function useSettings(): UseSettingsReturn {
     sheetName: 'Leads',
     githubSheetName: 'GitHub Leads',
     linkedinSheetName: 'LinkedIn Leads',
+    geminiApiKey: '',
+    geminiModel: 'gemini-3.6-flash',
   });
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [saveMsg, setSaveMsg] = useState('');
@@ -44,6 +48,14 @@ export function useSettings(): UseSettingsReturn {
 
   const updateLinkedinSheetName = useCallback((linkedinSheetName: string) => {
     setSettings((p: StoredSettings) => ({ ...p, linkedinSheetName }));
+  }, []);
+
+  const updateGeminiApiKey = useCallback((geminiApiKey: string) => {
+    setSettings((p: StoredSettings) => ({ ...p, geminiApiKey }));
+  }, []);
+
+  const updateGeminiModel = useCallback((geminiModel: string) => {
+    setSettings((p: StoredSettings) => ({ ...p, geminiModel }));
   }, []);
 
   const save = useCallback(async () => {
@@ -88,6 +100,8 @@ export function useSettings(): UseSettingsReturn {
     updateUrl,
     updateGithubSheetName,
     updateLinkedinSheetName,
+    updateGeminiApiKey,
+    updateGeminiModel,
     save,
     saveState,
     saveMsg,

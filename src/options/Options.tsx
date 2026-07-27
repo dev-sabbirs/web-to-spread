@@ -10,13 +10,14 @@ import './styles/tailwind.css';
 
 import { SendMailPage } from './components/SendMailPage';
 import { UserProfileCard } from './components/UserProfileCard';
+import { UsagePage } from './components/UsagePage';
 
-type TabId = 'dashboard' | 'leads' | 'send-mail' | 'profile' | 'settings' | 'guide';
+type TabId = 'dashboard' | 'leads' | 'send-mail' | 'profile' | 'usage' | 'settings' | 'guide';
 
 function getInitialTabState(): { tab: TabId; platform: 'github' | 'linkedin' } {
   const hash = window.location.hash.replace(/^#/, '');
   const [tabPart, queryPart] = hash.split('?');
-  const validTabs: TabId[] = ['dashboard', 'leads', 'send-mail', 'profile', 'settings', 'guide'];
+  const validTabs: TabId[] = ['dashboard', 'leads', 'send-mail', 'profile', 'usage', 'settings', 'guide'];
 
   const tab = validTabs.includes(tabPart as TabId) ? (tabPart as TabId) : 'dashboard';
 
@@ -54,8 +55,8 @@ export default function Options() {
     };
   }, []);
 
-  const handleSelectTab = (tab: TabId, platform?: 'github' | 'linkedin') => {
-    setActiveTab(tab);
+  const handleSelectTab = (tab: string, platform?: 'github' | 'linkedin') => {
+    setActiveTab(tab as TabId);
     if (platform) {
       setLeadsPlatform(platform);
     }
@@ -152,6 +153,17 @@ export default function Options() {
           </section>
         )}
 
+        {/* ── Dedicated Usage & Token Analytics Tab ── */}
+        {activeTab === 'usage' && (
+          <section id="usage" className="animate-in fade-in duration-200">
+            <div className="mb-6 pb-4 border-b border-[#21262d]">
+              <h2 className="text-xl font-bold text-[#e6edf3]">Usage & Plan Quotas</h2>
+              <p className="text-xs text-[#8b949e] mt-1">Monitor real-time token consumption, request rate limits, and plan details.</p>
+            </div>
+            <UsagePage onNavigate={handleSelectTab} />
+          </section>
+        )}
+
         {/* ── Settings Tab ── */}
         {activeTab === 'settings' && (
           <section id="settings" className="animate-in fade-in duration-200">
@@ -163,6 +175,8 @@ export default function Options() {
               url={hook.settings.appsScriptUrl}
               githubSheetName={hook.settings.githubSheetName}
               linkedinSheetName={hook.settings.linkedinSheetName}
+              geminiApiKey={hook.settings.geminiApiKey}
+              geminiModel={hook.settings.geminiModel}
               isValidUrl={hook.isValidUrl}
               isConfigured={hook.isConfigured}
               saveState={hook.saveState}
@@ -172,6 +186,8 @@ export default function Options() {
               onUrlChange={hook.updateUrl}
               onGithubSheetNameChange={hook.updateGithubSheetName}
               onLinkedinSheetNameChange={hook.updateLinkedinSheetName}
+              onGeminiApiKeyChange={hook.updateGeminiApiKey}
+              onGeminiModelChange={hook.updateGeminiModel}
               onSave={hook.save}
               onTest={hook.testConnection}
             />

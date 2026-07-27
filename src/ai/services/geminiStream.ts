@@ -1,9 +1,10 @@
 import { AI_CONFIG, SYSTEM_INSTRUCTIONS, type AiMode } from '../config';
 import { getFormattedTrainingPrompt } from './knowledgeLoader';
-import type { UserProfile } from '../../shared/storage';
+import { type UserProfile, recordAiUsage } from '../../shared/storage';
 
 export interface StreamParams {
   apiKey: string;
+  model?: string;
   prompt: string;
   tone: string;
   mode?: AiMode;
@@ -15,6 +16,7 @@ export interface StreamParams {
 
 export async function streamEmailGeneration({
   apiKey,
+  model = AI_CONFIG.DEFAULT_MODEL,
   prompt,
   tone,
   mode = 'client',
@@ -25,12 +27,13 @@ export async function streamEmailGeneration({
 }: StreamParams): Promise<void> {
   const trainingContext = getFormattedTrainingPrompt(mode);
   const systemInstructionText = SYSTEM_INSTRUCTIONS[mode].stream;
+  const targetModel = model || AI_CONFIG.DEFAULT_MODEL;
 
   // 1. Generate Subject Line First
   if (onSubject) {
     try {
       const subjRes = await fetch(
-        `${AI_CONFIG.BASE_URL}/${AI_CONFIG.DEFAULT_MODEL}:generateContent?key=${apiKey}`,
+        `${AI_CONFIG.BASE_URL}/${targetModel}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -59,61 +62,58 @@ export async function streamEmailGeneration({
         }
       }
     } catch {
-      // subject fallback
+      // non-fatal subject error
     }
   }
 
-  // 2. Stream Email Body Content
+  // 2. Stream Full Email Body SSE
   const senderContext = senderProfile
     ? `Sender Profile (You):
-- Name: ${senderProfile.name || 'Sabbir'}
-- Role/Title: ${senderProfile.title || 'Software Engineer'}
+- Name: ${senderProfile.name}
+- Role/Title: ${senderProfile.title}
 - Email: ${senderProfile.email || 'N/A'}
 - Portfolio: ${senderProfile.website || 'N/A'}
-- Bio/Background: ${senderProfile.bio || 'N/A'}
-- Pitch Offer: ${senderProfile.pitchGoal || 'N/A'}`
+- Bio/Background: ${senderProfile.bio}
+- Pitch Offer: ${senderProfile.pitchGoal}`
     : '';
 
-  const userPrompt = `Mode: ${mode.toUpperCase()} OUTREACH
-Outreach Goal: ${prompt}
-Tone: ${tone}
+  const userContextPrompt = `Goal: ${prompt}\nTone: ${tone}\n\n${senderContext}\n\n${
+    leadContext
+      ? `Recipient Context: Name: ${leadContext.name || 'Prospect'}, Title: ${
+          leadContext.headline || ''
+        }, Bio: ${leadContext.bio || 'N/A'}`
+      : ''
+  }`;
 
-${senderContext}
-
-${
-  leadContext
-    ? `Target Recipient Details:
-- Name: ${leadContext.name || 'Recipient'}
-- Headline/Title: ${leadContext.headline || 'Professional'}
-- Context/Bio: ${leadContext.bio || 'N/A'}`
-    : ''
-}
-
-Please write a highly tailored email body matching the sender background, recipient context, and mode instructions.`;
-
-  const systemInstructionWithTraining = `${systemInstructionText}${trainingContext}`;
-
-  const streamUrl = `${AI_CONFIG.BASE_URL}/${AI_CONFIG.DEFAULT_MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`;
-  const response = await fetch(streamUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: systemInstructionWithTraining }, { text: userPrompt }],
+  const res = await fetch(
+    `${AI_CONFIG.BASE_URL}/${targetModel}:streamGenerateContent?alt=sse&key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: systemInstructionText },
+              { text: trainingContext },
+              { text: userContextPrompt },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.7,
         },
-      ],
-      generationConfig: { temperature: 0.7 },
-    }),
-  });
+      }),
+    }
+  );
 
-  if (!response.ok || !response.body) {
-    throw new Error(`Gemini Stream Error (${response.status})`);
+  if (!res.ok || !res.body) {
+    const errText = await res.text();
+    throw new Error(`Gemini Stream Error (${res.status}): ${errText}`);
   }
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder('utf-8');
   let accumulatedHtml = '';
 
   while (true) {
@@ -140,4 +140,9 @@ Please write a highly tailored email body matching the sender background, recipi
       }
     }
   }
+
+  // Record dynamic streaming token consumption
+  const promptTokens = Math.ceil((prompt.length + systemInstructionText.length + trainingContext.length) / 4);
+  const responseTokens = Math.ceil(accumulatedHtml.length / 4);
+  recordAiUsage(promptTokens, responseTokens, targetModel).catch(() => {});
 }
