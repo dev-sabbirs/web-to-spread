@@ -66,7 +66,7 @@ export default function Options() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0d1117] text-[#e6edf3] font-sans antialiased">
+    <div className="flex min-h-screen bg-[#050505] text-[#f5f5f5] font-sans antialiased">
       <Sidebar
         isConfigured={hook.isConfigured}
         activeTab={activeTab}

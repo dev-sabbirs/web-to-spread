@@ -34,12 +34,12 @@ export function ConfigCard({
   const canTest   = isValidUrl && !isTesting;
 
   return (
-    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 flex flex-col gap-5 shadow-lg shadow-black/20">
+    <div className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-xl p-6 flex flex-col gap-5 shadow-2xl">
       {/* Card header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-[#e6edf3]">Connection Settings</h3>
-          <p className="text-xs text-[#8b949e] mt-0.5">
+          <h3 className="text-sm font-semibold text-[#f5f5f5]">Connection Settings</h3>
+          <p className="text-xs text-[#a3a3a3] mt-0.5">
             Link the extension to your Google Sheet via an Apps Script web app.
           </p>
         </div>
@@ -52,19 +52,19 @@ export function ConfigCard({
 
       {/* Apps Script URL */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="script-url">
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-[#737373]" htmlFor="script-url">
           Apps Script Web App URL <span className="text-red-400">*</span>
         </label>
         <div className="relative">
           <input
             id="script-url"
             type="url"
-            className={`w-full px-3 py-2 bg-[#0d1117] border rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none transition-all ${
+            className={`w-full px-3 py-2 bg-[#141414] border rounded-lg text-xs font-mono text-[#f5f5f5] placeholder-[#525252] outline-none transition-all ${
               url && !isValidUrl
                 ? 'border-red-500/80 focus:ring-2 focus:ring-red-500/20'
                 : isValidUrl
                 ? 'border-emerald-500/80 focus:ring-2 focus:ring-emerald-500/20 pr-9'
-                : 'border-[#30363d] focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20'
+                : 'border-[#262626] focus:border-[#404040]'
             }`}
             placeholder={`${APPS_SCRIPT_URL_PREFIX}AKfycb.../exec`}
             value={url}
@@ -83,9 +83,9 @@ export function ConfigCard({
             <AlertIcon size={12} /> Must start with <code className="bg-red-500/10 px-1 py-0.5 rounded">{APPS_SCRIPT_URL_PREFIX}</code>
           </p>
         )}
-        <p className="text-xs text-[#8b949e]">
+        <p className="text-xs text-[#737373]">
           Deploy your Apps Script as a Web App, then paste the URL here.{' '}
-          <a href="#guide" className="text-indigo-400 hover:text-indigo-300 font-medium hover:underline">
+          <a href="#guide" className="text-[#d4d4d4] hover:text-white font-medium hover:underline">
             Setup guide ↓
           </a>
         </p>
@@ -94,73 +94,73 @@ export function ConfigCard({
       {/* Sheet tab names */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="github-sheet-name">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#737373]" htmlFor="github-sheet-name">
             GitHub Leads Tab
           </label>
           <input
             id="github-sheet-name"
             type="text"
-            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full px-3 py-2 bg-[#141414] border border-[#262626] rounded-lg text-xs font-mono text-[#f5f5f5] placeholder-[#525252] outline-none focus:border-[#404040] transition-all"
             placeholder="GitHub Leads"
             value={githubSheetName}
             onChange={(e) => onGithubSheetNameChange(e.target.value)}
           />
-          <p className="text-xs text-[#8b949e]">Target tab for GitHub profiles.</p>
+          <p className="text-xs text-[#737373]">Target tab for GitHub profiles.</p>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="linkedin-sheet-name">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-[#737373]" htmlFor="linkedin-sheet-name">
             LinkedIn Leads Tab
           </label>
           <input
             id="linkedin-sheet-name"
             type="text"
-            className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full px-3 py-2 bg-[#141414] border border-[#262626] rounded-lg text-xs font-mono text-[#f5f5f5] placeholder-[#525252] outline-none focus:border-[#404040] transition-all"
             placeholder="LinkedIn Leads"
             value={linkedinSheetName}
             onChange={(e) => onLinkedinSheetNameChange(e.target.value)}
           />
-          <p className="text-xs text-[#8b949e]">Target tab for LinkedIn profiles.</p>
+          <p className="text-xs text-[#737373]">Target tab for LinkedIn profiles.</p>
         </div>
       </div>
 
       {/* Gemini AI Settings Section */}
-      <div className="pt-4 border-t border-[#21262d] flex flex-col gap-4">
+      <div className="pt-4 border-t border-[#1c1c1c] flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-xs font-bold text-[#e6edf3] uppercase tracking-wider">Gemini AI Studio Credentials</h4>
-            <p className="text-xs text-[#8b949e] mt-0.5">Customize your own API Key and Gemini Model tier.</p>
+            <h4 className="text-xs font-bold text-[#f5f5f5] uppercase tracking-wider">Gemini AI Studio Credentials</h4>
+            <p className="text-xs text-[#737373] mt-0.5">Customize your own API Key and Gemini Model tier.</p>
           </div>
-          <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded">
+          <span className="text-[10px] font-mono bg-[#1c1c1c] text-[#d4d4d4] border border-[#262626] px-2 py-0.5 rounded">
             Default: System Key Active
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2 flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="gemini-api-key">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#737373]" htmlFor="gemini-api-key">
               Custom Gemini API Key
             </label>
             <input
               id="gemini-api-key"
               type="password"
-              className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-mono text-[#e6edf3] placeholder-[#484f58] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+              className="w-full px-3 py-2 bg-[#141414] border border-[#262626] rounded-lg text-xs font-mono text-[#f5f5f5] placeholder-[#525252] outline-none focus:border-[#404040] transition-all"
               placeholder="AIzaSy... (Leave empty to use system default key)"
               value={geminiApiKey}
               onChange={(e) => onGeminiApiKeyChange(e.target.value)}
             />
-            <p className="text-[11px] text-[#8b949e]">
+            <p className="text-[11px] text-[#737373]">
               If left blank, the extension automatically uses your built-in environment AI key.
             </p>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#8b949e]" htmlFor="gemini-model">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-[#737373]" htmlFor="gemini-model">
               Gemini Model Tier
             </label>
             <select
               id="gemini-model"
-              className="w-full px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs font-semibold text-[#e6edf3] outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all cursor-pointer"
+              className="w-full px-3 py-2 bg-[#141414] border border-[#262626] rounded-lg text-xs font-semibold text-[#f5f5f5] outline-none focus:border-[#404040] transition-all cursor-pointer"
               value={geminiModel || "gemini-3.6-flash"}
               onChange={(e) => onGeminiModelChange(e.target.value)}
             >
@@ -168,7 +168,7 @@ export function ConfigCard({
               <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Context)</option>
               <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
             </select>
-            <p className="text-[11px] text-[#8b949e]">Model endpoint for content generation.</p>
+            <p className="text-[11px] text-[#737373]">Model endpoint for content generation.</p>
           </div>
         </div>
       </div>
@@ -176,27 +176,28 @@ export function ConfigCard({
       {/* Actions */}
       <div className="flex items-center gap-3 pt-1">
         <button
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
             testState === 'success'
-              ? 'border-emerald-500/50 text-emerald-400 bg-emerald-500/10'
+              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
               : testState === 'error'
-              ? 'border-red-500/50 text-red-400 bg-red-500/10'
-              : 'bg-[#21262d] border-[#30363d] text-[#e6edf3] hover:bg-[#30363d] disabled:opacity-40 disabled:cursor-not-allowed'
-          }`}
+              ? 'bg-red-500/10 text-red-400 border-red-500/30'
+              : 'bg-[#141414] hover:bg-[#262626] text-[#d4d4d4] hover:text-white border-[#262626]'
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
           onClick={onTest}
           disabled={!canTest}
+          type="button"
         >
-          {isTesting ? <><SpinnerIcon size={14} /> Testing…</> : 'Test Connection'}
+          {isTesting ? (
+            <>
+              <SpinnerIcon size={14} /> Testing URL...
+            </>
+          ) : (
+            'Test Connection'
+          )}
         </button>
 
         <button
-          className={`inline-flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-semibold text-white transition-all shadow-md ${
-            saveState === 'saved'
-              ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/30'
-              : saveState === 'error'
-              ? 'bg-red-600 hover:bg-red-500 shadow-red-900/30'
-              : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none'
-          }`}
+          className="inline-flex items-center gap-2 px-5 py-2 bg-[#171717] hover:bg-[#262626] border border-[#262626] hover:border-[#404040] text-[#f5f5f5] font-semibold text-xs rounded-lg transition-all shadow-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           onClick={onSave}
           disabled={!canSave}
         >

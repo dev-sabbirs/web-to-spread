@@ -43,18 +43,18 @@ export function UserProfileCard() {
   return (
     <form
       onSubmit={handleSave}
-      className="bg-[#161b22] border border-[#30363d] rounded-2xl p-8 flex flex-col gap-6 max-w-5xl shadow-xl transition-all"
+      className="bg-[#0a0a0a] border border-[#1c1c1c] rounded-2xl p-8 flex flex-col gap-6 max-w-5xl shadow-2xl transition-all"
     >
-      <div className="flex items-center justify-between border-b border-[#21262d] pb-5">
+      <div className="flex items-center justify-between border-b border-[#1c1c1c] pb-5">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">
+          <div className="w-12 h-12 rounded-2xl bg-[#1c1c1c] border border-[#262626] flex items-center justify-center text-[#f5f5f5] font-bold shadow-md">
             <UserIcon size={24} />
           </div>
           <div>
-            <h3 className="text-base font-bold text-[#e6edf3]">
+            <h3 className="text-base font-bold text-[#f5f5f5]">
               Personal AI Outreach Profile
             </h3>
-            <p className="text-xs text-[#8b949e] mt-0.5">
+            <p className="text-xs text-[#737373] mt-0.5">
               These details train Gemini AI to speak in your voice, highlight your experience, and offer your services.
             </p>
           </div>
@@ -69,7 +69,7 @@ export function UserProfileCard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             Your Full Name
           </label>
           <input
@@ -78,12 +78,12 @@ export function UserProfileCard() {
             value={profile.name}
             onChange={(e) => handleChange("name", e.target.value)}
             placeholder="e.g. Sabbir Hossain Shuvo"
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-2.5 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-2.5 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             Professional Title / Role
           </label>
           <input
@@ -92,12 +92,12 @@ export function UserProfileCard() {
             value={profile.title}
             onChange={(e) => handleChange("title", e.target.value)}
             placeholder="e.g. Backend Software Engineer • DevOps Engineer"
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-2.5 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-2.5 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             Primary Email Address
           </label>
           <input
@@ -105,12 +105,12 @@ export function UserProfileCard() {
             value={profile.email}
             onChange={(e) => handleChange("email", e.target.value)}
             placeholder="sabbir@example.com"
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-2.5 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-2.5 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             Personal Portfolio / Website URL
           </label>
           <input
@@ -118,14 +118,14 @@ export function UserProfileCard() {
             value={profile.website}
             onChange={(e) => handleChange("website", e.target.value)}
             placeholder="https://mysite.com"
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-2.5 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-2.5 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all"
           />
         </div>
       </div>
 
       <div className="flex flex-col gap-5 text-xs pt-1">
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             About / Detailed Experience & Tech Stack Bio
           </label>
           <textarea
@@ -133,12 +133,12 @@ export function UserProfileCard() {
             onChange={(e) => handleChange("bio", e.target.value)}
             rows={5}
             placeholder="Detailed summary of your engineering background, microservices, cloud infrastructure, key tech stack..."
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all leading-relaxed"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-3 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all leading-relaxed"
           />
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold text-[#8b949e] uppercase tracking-wider mb-1.5">
+          <label className="block text-[11px] font-bold text-[#737373] uppercase tracking-wider mb-1.5">
             Primary Value Offer / Pitch Goal
           </label>
           <textarea
@@ -146,16 +146,16 @@ export function UserProfileCard() {
             onChange={(e) => handleChange("pitchGoal", e.target.value)}
             rows={4}
             placeholder="Describe your primary service offering or pitch strategy for prospective clients and hiring managers..."
-            className="w-full bg-[#0d1117] border border-[#30363d] rounded-xl px-4 py-3 text-[#e6edf3] focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all leading-relaxed"
+            className="w-full bg-[#141414] border border-[#262626] rounded-xl px-4 py-3 text-[#f5f5f5] focus:outline-none focus:border-[#404040] transition-all leading-relaxed"
           />
         </div>
       </div>
 
-      <div className="flex justify-end pt-3 border-t border-[#21262d]">
+      <div className="flex justify-end pt-3 border-t border-[#1c1c1c]">
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/25 flex items-center gap-2 cursor-pointer"
+          className="px-6 py-3 bg-[#171717] hover:bg-[#262626] border border-[#262626] hover:border-[#404040] text-[#f5f5f5] font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
         >
           {saving ? (
             <>
